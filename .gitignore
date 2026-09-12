@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+playwright-report/
+test-results/
+
+# Local data and env
+.data/
+.env
+.env.local
+.env.*.local
+
+# Editor / OS
+.DS_Store
+*.log

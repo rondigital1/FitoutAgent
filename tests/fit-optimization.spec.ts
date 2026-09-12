@@ -1,0 +1,32 @@
+import { test, expect } from '@playwright/test';
+
+test('fit evidence and one-click basket creation work in the responsive side panel', async ({ page }, testInfo) => {
+  const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
+  await page.goto('/');
+  await page.getByRole('textbox').fill('fit scenario under $1000');
+  await page.getByRole('button', { name: 'Make my list' }).click();
+  await page.getByRole('button', { name: 'Find products for this list' }).click();
+  await expect(page.getByRole('button', { name: /Oak desk A.*in your plan/ })).toBeVisible();
+  await page.getByRole('button', { name: /Desk cover.*Open preview/ }).click();
+  await expect(page.getByRole('region', { name: 'Product fit assessment' })).toContainText('A cover is an accessory');
+  await expect(page.getByRole('button', { name: 'Choose this product' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Close', exact: true }).click();
+  await page.getByRole('tab', { name: 'Fewer stores', exact: true }).click();
+  await expect(page.locator('.wk-dock__main')).toContainText('1 store');
+  await expect(page.getByRole('button', { name: 'Apply this basket' })).toHaveCount(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.screenshot({ path: testInfo.outputPath('basket-controls-mobile.png') });
+  await page.setViewportSize({ width: 1280, height: 900 });
+  const panel = await page.getByRole('complementary', { name: 'Basket controls' }).boundingBox();
+  const workspace = await page.locator('.wk-stage').boundingBox();
+  expect(panel!.x).toBeGreaterThanOrEqual(workspace!.x + workspace!.width);
+  expect(panel!.height).toBeLessThan(400);
+  await page.screenshot({ path: testInfo.outputPath('basket-controls-desktop.png') });
+  await page.getByRole('button', { name: 'Create basket' }).click();
+  await expect(page.getByRole('heading', { name: 'Your basket', exact: true })).toBeVisible();
+  await expect(page.getByRole('status')).toHaveText('Done');
+  await expect(page.locator('.wk-basket__links')).toContainText('Oak desk B');
+  await page.reload();
+  await expect(page.locator('.wk-basket__links')).toContainText('Oak desk B');
+  expect(errors).toEqual([]);
+});

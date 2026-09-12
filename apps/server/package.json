@@ -1,0 +1,29 @@
+{
+  "name": "@settlein/server",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --exclude \"**/node_modules/**\" src/index.ts",
+    "build": "tsc --noEmit && tsup",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test src/*.test.ts"
+  },
+  "dependencies": {
+    "@ag-ui/core": "0.0.59",
+    "@ag-ui/encoder": "0.0.59",
+    "@settlein/shared": "workspace:*",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "openai": "^7.15.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^24.0.0",
+    "tsup": "^8.5.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.3"
+  }
+}

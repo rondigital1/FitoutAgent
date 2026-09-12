@@ -1,0 +1,71 @@
+import { test, expect } from '@playwright/test';
+
+test('replace an agent basket product and prepare updated links', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('textbox').fill('office under $1500');
+  await page.getByRole('radio', { name: /Let the agent/ }).check();
+  await page.getByRole('button', { name: 'Find everything for me' }).click();
+  await expect(page.getByRole('status')).toHaveText('Done');
+  const rows = page.locator('.wk-unified__item');
+  const original = await rows.locator('h2').allTextContents();
+  await rows.first().getByRole('button', { name: /^Replace/ }).click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
+  await dialog.getByRole('button', { name: 'Cancel' }).click();
+  await expect(rows.first().locator('h2')).toHaveText(original[0]);
+  await rows.first().getByRole('button', { name: /^Replace/ }).click();
+  const replacement = await dialog.locator('h3').first().textContent();
+  await dialog.getByRole('button', { name: /^Use .* instead/ }).first().click();
+  await expect(dialog).not.toBeVisible();
+  await expect(rows.first().locator('h2')).toHaveText(replacement!);
+  expect((await rows.locator('h2').allTextContents()).slice(1)).toEqual(original.slice(1));
+  await expect(page.getByRole('button', { name: 'Create basket' })).toBeEnabled();
+  await page.getByRole('button', { name: 'Create basket' }).click();
+  await expect(page.getByRole('status')).toHaveText('Done');
+  await page.reload();
+  await expect(rows.first().locator('h2')).toHaveText(replacement!);
+});
+
+test('basket quantities and removed picks persist and can be restored', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('textbox').fill('office under $1500');
+  await page.getByRole('radio', { name: /Let the agent/ }).check();
+  await page.getByRole('button', { name: 'Find everything for me' }).click();
+  await expect(page.getByRole('status')).toHaveText('Done');
+  const row = page.locator('.wk-unified__item').first();
+  const name = await row.locator('h2').textContent();
+  const count = await page.locator('.wk-unified__item').count();
+  const qty = row.locator('.wk-basket-quantity span');
+  const original = Number(await qty.textContent());
+  await row.getByRole('button', { name: /^Increase quantity/ }).click();
+  await expect(qty).toHaveText(String(original + 1));
+  await expect(page.getByRole('button', { name: 'Create basket' })).toBeEnabled();
+  await page.reload();
+  await page.getByRole('button', { name: 'Basket', exact: true }).click();
+  await expect(qty).toHaveText(String(original + 1));
+  await row.getByRole('button', { name: /^Remove / }).click();
+  await expect(page.locator('.wk-unified__item')).toHaveCount(count - 1);
+  await page.reload();
+  await page.getByRole('button', { name: 'Basket', exact: true }).click();
+  await page.getByRole('button', { name: /^Restore / }).click();
+  await expect(page.locator('.wk-unified__item')).toHaveCount(count);
+  await expect(page.locator('.wk-unified__item').filter({ has: page.getByRole('heading', { name: name!, exact: true }) }).locator('.wk-basket-quantity span')).toHaveText(String(original + 1));
+  await page.getByRole('button', { name: 'Create basket' }).click();
+  await expect(page.getByRole('status')).toHaveText('Done');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+});
+
+test('browse from a completed basket reopens shopping without losing picks', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('textbox').fill('office under $1500');
+  await page.getByRole('radio', { name: /Let the agent/ }).check();
+  await page.getByRole('button', { name: 'Find everything for me' }).click();
+  await expect(page.getByRole('status')).toHaveText('Done');
+  const original = await page.locator('.wk-unified__item h2').allTextContents();
+  await page.getByRole('button', { name: '+ Add or browse products' }).click();
+  await expect(page.getByRole('status')).toHaveText('Compare');
+  await expect(page.getByRole('heading', { name: 'Your agent’s product picks' })).toBeVisible();
+  await page.getByRole('button', { name: 'Basket', exact: true }).click();
+  expect(await page.locator('.wk-unified__item h2').allTextContents()).toEqual(original);
+  await expect(page.getByRole('button', { name: 'Create basket' })).toBeEnabled();
+});

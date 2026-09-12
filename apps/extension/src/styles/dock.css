@@ -1,0 +1,54 @@
+/* Compact basket actions beside the shopping workspace. */
+.wk-dock {
+  align-self: start;
+  color: var(--wk-night-ink);
+  background: var(--wk-night);
+  border-radius: var(--wk-r);
+  margin: 0 16px 24px;
+  padding: 20px;
+}
+.wk-dock__inner { display: grid; gap: 18px; }
+.wk-dock__title { margin: 0; font-size: 16px; color: #fff; }
+.wk-dock__switch { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.wk-dock__tab {
+  min-width: 0;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--wk-night-line);
+  border-radius: var(--wk-r-sm);
+  box-shadow: none;
+  padding: 9px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  white-space: normal;
+  color: var(--wk-night-dim);
+}
+.wk-dock__tab:hover:not(:disabled) { background: rgba(255, 255, 255, 0.12); color: #fff; }
+.wk-dock__tab.is-active { color: var(--wk-night); background: #fff; border-color: #fff; }
+.wk-dock__main { display: grid; gap: 18px; }
+.wk-dock__total { font-variant-numeric: tabular-nums; font-size: 26px; font-weight: 700; letter-spacing: -0.025em; line-height: 1.2; color: #fff; }
+.wk-dock__total.is-unknown { color: #ffd479; font-size: 22px; }
+.wk-dock__sub { font-size: 12px; line-height: 1.5; color: var(--wk-night-dim); margin-top: 6px; }
+.wk-dock .primary { width: 100%; background: #fff; border-color: #fff; color: var(--wk-night); }
+.wk-dock .primary:hover:not(:disabled) { background: #dce7f7; border-color: #dce7f7; }
+.wk-dock .primary:disabled { background: rgba(255, 255, 255, 0.14); border-color: transparent; color: rgba(255, 255, 255, 0.4); }
+.wk-dock__issues { font-size: 12px; color: #ffb3b3; }
+.wk-dock__issues summary { cursor: pointer; }
+.wk-dock__issues ul { padding-left: 18px; margin: 12px 0; }
+.wk-dock__issues li { margin-bottom: 6px; }
+.wk-dock__issues .btn-quiet { color: #9fc4ff; }
+
+@media (min-width: 1000px) {
+  .wk-app--with-dock { grid-template-columns: minmax(0, 1fr) 300px; grid-template-rows: auto 1fr; }
+  .wk-app--with-dock > .wk-top { grid-column: 1 / -1; }
+  .wk-app--with-dock > .wk-stage { grid-column: 1; grid-row: 2; }
+  .wk-dock { grid-column: 2; grid-row: 2; position: sticky; top: 166px; margin: 30px 24px 24px 0; max-height: calc(100dvh - 190px); overflow-y: auto; }
+}
+@media (max-width: 999px) {
+  .wk-app--with-dock > .wk-stage { grid-row: 3; }
+  .wk-dock { grid-row: 2; margin-top: 18px; }
+  .wk-dock__main { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+}
+@media (max-width: 350px) {
+  .wk-dock__main { grid-template-columns: minmax(0, 1fr); }
+}

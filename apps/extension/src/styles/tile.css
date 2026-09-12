@@ -1,0 +1,196 @@
+/* Product tile: the unit of emphasis. Every found product is a card that reacts
+   to hover, pick, and lock, and wears badges for why it stands out. */
+.wk-tile {
+  position: relative;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+  text-align: left;
+  background: var(--wk-surface);
+  border: 1px solid var(--wk-line);
+  border-radius: var(--wk-r-lg);
+  box-shadow: var(--wk-shadow-card);
+  transition: border-color var(--wk-ease), box-shadow var(--wk-spring),
+    transform var(--wk-spring), background var(--wk-ease);
+}
+.wk-tile::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: linear-gradient(90deg, var(--wk-accent), #2a67bd);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--wk-spring);
+  z-index: 2;
+}
+.wk-tile:hover:not(:disabled) {
+  background: var(--wk-surface);
+  border-color: var(--wk-accent-line);
+  box-shadow: var(--wk-shadow-lift);
+  transform: translateY(-3px);
+}
+.wk-tile:hover:not(:disabled)::before { transform: scaleX(1); }
+.wk-tile:hover:not(:disabled) .wk-tile__art img { transform: scale(1.05); }
+.wk-tile:hover:not(:disabled) .wk-tile__peek { opacity: 1; transform: translateY(0); }
+.wk-tile:active:not(:disabled) { transform: translateY(-1px); }
+.wk-tile:disabled { cursor: default; background: var(--wk-surface); }
+
+.wk-tile.is-selected {
+  border-color: var(--wk-accent);
+  box-shadow: 0 0 0 2px var(--wk-accent-line), var(--wk-shadow-lift);
+  animation: wk-pick var(--wk-spring) both;
+}
+.wk-tile.is-selected::before { transform: scaleX(1); }
+@keyframes wk-pick { from { transform: scale(0.975); } to { transform: scale(1); } }
+
+/* Standout picks: cheapest in the shelf, or the one whose fit is fully supported. */
+.wk-tile.is-hero { border-color: var(--wk-accent-line); }
+.wk-tile.is-hero .wk-tile__art { background: linear-gradient(180deg, rgba(19, 58, 111, 0.06), var(--wk-surface-2)); }
+
+.wk-tile.is-unavailable { border-style: dashed; }
+.wk-tile.is-unavailable .wk-tile__art img,
+.wk-tile.is-unavailable .wk-tile__art svg { filter: grayscale(1); opacity: 0.5; }
+.wk-tile.is-unavailable .wk-tile__name { color: var(--wk-ink-dim); }
+.wk-tile.is-misfit { border-color: rgba(180, 35, 42, 0.3); }
+
+/* ---- Art ---- */
+.wk-tile__art {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: var(--wk-surface-2);
+  border-bottom: 1px solid var(--wk-line);
+  overflow: hidden;
+}
+.wk-tile__art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.wk-tile__art svg { display: block; width: 100%; height: 100%; }
+
+.wk-tile__flags { position: absolute; inset: 8px auto auto 8px; display: grid; gap: 4px; justify-items: start; }
+.wk-tile__corner { position: absolute; inset: 8px 8px auto auto; display: grid; gap: 4px; justify-items: end; }
+.wk-tile__mark { position: absolute; inset: auto auto 8px 8px; }
+
+.wk-flag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 9.5px;
+  font-weight: 750;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow: 0 1px 4px rgba(10, 21, 32, 0.18);
+}
+.wk-flag--price { background: var(--wk-accent); color: #fff; }
+.wk-flag--fit { background: var(--wk-night); color: #fff; }
+
+.wk-tile__peek {
+  position: absolute;
+  inset: auto 0 0;
+  padding: 7px 9px;
+  background: linear-gradient(0deg, rgba(10, 21, 32, 0.88), rgba(10, 21, 32, 0));
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-align: right;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity var(--wk-ease), transform var(--wk-spring);
+}
+
+/* ---- Meta ---- */
+.wk-tile__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 11px 12px 13px;
+}
+.wk-tile__brand {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--wk-ink-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wk-tile__name {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--wk-ink);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.wk-tile__variant {
+  font-size: 11px;
+  color: var(--wk-ink-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wk-tile__fit { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; color: var(--wk-ink-dim); }
+.wk-dot { width: 7px; height: 7px; flex: none; border-radius: 50%; background: var(--wk-ink-faint); }
+.wk-dot--ok { background: var(--wk-ok); }
+.wk-dot--warn { background: var(--wk-warn); }
+.wk-dot--bad { background: var(--wk-danger); }
+
+.wk-tile__foot {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 4px;
+  padding-top: 9px;
+  border-top: 1px solid var(--wk-line);
+}
+.wk-tile__price {
+  font-variant-numeric: tabular-nums;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--wk-ink);
+}
+.wk-tile__price.is-unknown { color: var(--wk-warn); font-size: 11.5px; font-weight: 650; }
+.wk-tile__delta { font-size: 10.5px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--wk-ink-dim); white-space: nowrap; }
+
+/* ---- Retailer mark ---- */
+.wk-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px 3px 4px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(4px);
+  border: 1px solid var(--wk-line-strong);
+  border-radius: 999px;
+  box-shadow: 0 1px 3px rgba(10, 21, 32, 0.12);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--wk-ink);
+  white-space: nowrap;
+}
+.wk-mark--lg { font-size: 11px; padding: 5px 11px 5px 6px; }
+
+@media (min-width: 720px) {
+  .wk-tile__name { font-size: 13.5px; }
+  .wk-tile__price { font-size: 17px; }
+}

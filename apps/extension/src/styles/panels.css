@@ -1,0 +1,198 @@
+/* Paper panels: setup form, checklist review, activity log. */
+.wk-panel, .wk-form, .wk-review {
+  background: var(--wk-surface);
+  border: 1px solid var(--wk-line);
+  border-radius: var(--wk-r-lg);
+  box-shadow: var(--wk-shadow-card);
+  padding: 18px;
+  max-width: 720px;
+}
+
+.wk-panel__actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+
+.wk-form label { margin-bottom: 14px; }
+.wk-form label > .wk-label { margin-bottom: 0; }
+.wk-form__hint { font-size: 12.5px; line-height: 1.55; color: var(--wk-ink-dim); margin: 2px 0 14px; }
+.wk-form .primary { width: 100%; }
+.wk-form textarea { min-height: 148px; }
+
+/* ---- Checklist rows ---- */
+.wk-check { border-top: 1px solid var(--wk-line); margin-top: 10px; }
+.wk-check__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 2px;
+  border-bottom: 1px solid var(--wk-line);
+  transition: background var(--wk-ease);
+}
+.wk-check__row:hover { background: var(--wk-surface-2); }
+.wk-check__main { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.wk-check__label {
+  font-size: 13.5px;
+  font-weight: 550;
+  text-transform: capitalize;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wk-check__actions { display: flex; align-items: center; gap: 6px; }
+.wk-check__actions input { width: 58px; margin: 0; padding: 7px 4px; text-align: center; }
+
+/* ---- Checklist review form ---- */
+.wk-review__goal {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--wk-ink);
+  background: var(--wk-accent-soft);
+  border: 1px solid var(--wk-accent-line);
+  border-left: 3px solid var(--wk-accent);
+  border-radius: var(--wk-r);
+  padding: 12px 14px;
+  margin: 0 0 12px;
+  overflow-wrap: anywhere;
+}
+.wk-review__room { display: block; margin: 22px 0 0; color: var(--wk-accent); }
+.wk-review__room:first-of-type { margin-top: 10px; }
+.wk-review .wk-check__label { white-space: normal; overflow-wrap: anywhere; }
+.wk-review button, .wk-review input { min-height: 40px; }
+
+.wk-review__add {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 8px;
+  margin-top: 18px;
+}
+.wk-review__add label { margin: 0; }
+
+.wk-review__extras { margin-top: 18px; border-top: 1px solid var(--wk-line); }
+.wk-review__search {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--wk-line-strong);
+}
+.wk-review__search details { margin: 8px 0 14px; }
+.wk-review__search .primary { width: 100%; margin-top: 18px; }
+
+.wk-review summary, .wk-review__extras summary, .wk-review__search details summary {
+  cursor: pointer;
+  padding: 10px 2px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--wk-accent);
+  border-radius: var(--wk-r-sm);
+}
+.wk-review summary:hover { color: var(--wk-accent-lift); }
+
+/* Shopping preference is one accessible radio group before submission. */
+.wk-mode { border: 0; padding: 0; margin: 20px 0 16px; min-width: 0; }
+.wk-mode legend { margin-bottom: 10px; }
+.wk-form .wk-mode__option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  margin: 0 0 8px;
+  background: var(--wk-surface);
+  border: 1px solid var(--wk-line-strong);
+  border-radius: var(--wk-r);
+  cursor: pointer;
+  transition: border-color var(--wk-ease), box-shadow var(--wk-ease), background var(--wk-ease);
+}
+.wk-form .wk-mode__option:hover { border-color: var(--wk-accent-line); background: var(--wk-surface-2); }
+.wk-mode__option input { width: 18px; height: 18px; flex: none; margin: 2px 0 0; accent-color: var(--wk-accent); }
+.wk-mode__option strong { display: block; font-size: 13.5px; font-weight: 650; }
+.wk-mode__option small { display: block; color: var(--wk-ink-dim); font-size: 12px; line-height: 1.5; margin-top: 4px; }
+.wk-mode__option:has(input:checked) {
+  border-color: var(--wk-accent);
+  background: var(--wk-accent-soft);
+  box-shadow: var(--wk-shadow-ring);
+}
+.wk-mode__option:has(input:checked) strong { color: var(--wk-accent); }
+.wk-mode__option:has(input:focus-visible) { outline: 2px solid var(--wk-blue); outline-offset: 2px; }
+.wk-mode:disabled { opacity: 0.6; }
+
+/* ---- Activity log ---- */
+.wk-activity {
+  max-width: 720px;
+  margin-top: 20px;
+  background: var(--wk-surface);
+  border: 1px solid var(--wk-line);
+  border-radius: var(--wk-r-lg);
+  box-shadow: var(--wk-shadow-card);
+  padding: 4px 16px;
+}
+.wk-activity summary {
+  cursor: pointer;
+  padding: 11px 2px;
+  font-size: 11.5px;
+  font-weight: 650;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--wk-ink-dim);
+  border-radius: var(--wk-r-sm);
+}
+.wk-activity summary:hover { color: var(--wk-accent); }
+.wk-activity ol { margin: 4px 0 12px; padding: 0; list-style: none; counter-reset: wk-log; }
+.wk-activity li {
+  counter-increment: wk-log;
+  position: relative;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--wk-ink-dim);
+  padding: 7px 0 7px 30px;
+  border-bottom: 1px solid var(--wk-line);
+}
+.wk-activity li:last-child { border-bottom: 0; }
+.wk-activity li::before {
+  content: counter(wk-log, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 7px;
+  font-variant-numeric: tabular-nums;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--wk-accent-line);
+}
+
+/* ---- Progress + empty states ---- */
+.wk-working {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 550;
+  color: var(--wk-accent);
+  background: var(--wk-accent-soft);
+  border: 1px solid var(--wk-accent-line);
+  border-radius: var(--wk-r);
+  padding: 13px 15px;
+  margin: 0 0 14px;
+}
+.wk-working::before {
+  content: '';
+  width: 14px;
+  height: 14px;
+  flex: none;
+  border-radius: 50%;
+  border: 2px solid var(--wk-accent-line);
+  border-top-color: var(--wk-accent);
+  animation: wk-spin 720ms linear infinite;
+}
+@keyframes wk-spin { to { transform: rotate(360deg); } }
+
+.wk-empty {
+  font-size: 13px;
+  color: var(--wk-ink-dim);
+  padding: 36px 20px;
+  text-align: center;
+  background: var(--wk-surface);
+  border: 1px dashed var(--wk-line-strong);
+  border-radius: var(--wk-r-lg);
+}
+
+@media (min-width: 720px) {
+  .wk-panel, .wk-form, .wk-review { padding: 24px; }
+}

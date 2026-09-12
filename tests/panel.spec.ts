@@ -1,0 +1,56 @@
+import { test, expect } from '@playwright/test';
+
+test('one prompt → editable apartment list → product search', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', e => errors.push(e.message));
+  await page.goto('/');
+  await expect(page.getByRole('textbox')).toHaveCount(1);
+  await page.getByRole('textbox', { name: 'What do you need?' }).fill('Furnish an 800 sqft 2br apt for 2 people. We already have a sofa.');
+  await page.screenshot({ path: 'test-results/prompt.png', fullPage: true });
+  await page.getByRole('button', { name: 'Make my list' }).click();
+  const review = page.getByRole('form', { name: 'Review shopping list' });
+  await expect(review).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Bedrooms', exact: true })).toBeVisible();
+  await expect(page.getByRole('spinbutton', { name: 'Bed frame quantity' })).toHaveValue('2');
+  await expect(page.getByRole('spinbutton', { name: 'Sofa quantity' })).toHaveCount(0);
+  await page.getByRole('spinbutton', { name: 'Bed frame quantity' }).fill('1');
+  await page.getByRole('spinbutton', { name: 'Mattress quantity' }).fill('1');
+  await page.getByRole('button', { name: 'Remove Coffee table' }).click();
+  await page.getByRole('textbox', { name: 'Missing something?' }).fill('Bath towels');
+  await page.getByRole('button', { name: 'Add item', exact: true }).click();
+  await page.reload();
+  await expect(page.getByRole('spinbutton', { name: 'Bed frame quantity' })).toHaveValue('1');
+  await expect(page.getByRole('spinbutton', { name: 'Coffee table quantity' })).toHaveCount(0);
+  await expect(page.getByRole('spinbutton', { name: 'Bath towels quantity' })).toHaveValue('1');
+  await page.getByRole('spinbutton', { name: 'Total budget' }).fill('5000');
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.screenshot({ path: 'test-results/list-review.png', fullPage: true });
+  const submitted = page.waitForRequest(request => request.url().endsWith('/agent') && request.method() === 'POST' && request.postDataJSON()?.forwardedProps?.decision?.type === 'confirm-checklist');
+  await page.getByRole('button', { name: 'Find products for this list' }).click();
+  const decision = (await submitted).postDataJSON().forwardedProps.decision;
+  expect(decision.items.some((item: { label: string }) => item.label === 'Bath towels')).toBe(true);
+  expect(decision.items.some((item: { id: string }) => item.id === 'coffee-table')).toBe(false);
+  expect(decision.items.find((item: { id: string }) => item.id === 'bed').quantity).toBe(1);
+  await expect(page.getByRole('heading', { name: 'Offers by category' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Bed frame', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Coffee table', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('status')).toHaveText('Compare');
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'Offers by category' })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  expect(errors).toEqual([]);
+});
+
+test('adding optional extras preserves quantity edits and removals', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('textbox').fill('Set up an office for two people under $1,500.');
+  await page.getByRole('button', { name: 'Make my list' }).click();
+  const quantity = page.getByRole('spinbutton', { name: /quantity/ }).first();
+  const label = await quantity.getAttribute('aria-label');
+  await quantity.fill('3');
+  await page.getByRole('button', { name: /Remove/ }).last().click();
+  await page.getByText('Optional extras', { exact: true }).click();
+  await page.getByRole('button', { name: /Add / }).last().click();
+  await expect(page.getByRole('spinbutton', { name: label!, exact: true })).toHaveValue('3');
+  await expect(page.getByRole('spinbutton', { name: 'Total budget' })).toHaveValue('1500');
+});

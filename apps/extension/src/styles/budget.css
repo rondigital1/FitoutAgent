@@ -1,0 +1,45 @@
+/* Budget tiers: four pressable cards, then an exact amount. */
+.wk-budget { min-width: 0; container-type: inline-size; }
+.wk-budget legend { margin-bottom: 8px; }
+.wk-budget__tiers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.wk-budget .wk-budget__tier {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+  min-height: 68px;
+  padding: 12px 8px;
+  background: var(--wk-surface);
+  color: var(--wk-ink);
+  border: 1px solid var(--wk-line-strong);
+  border-radius: var(--wk-r);
+  font-weight: 650;
+  touch-action: manipulation;
+  transition: background var(--wk-ease), color var(--wk-ease), border-color var(--wk-ease),
+    box-shadow var(--wk-ease), transform 90ms ease;
+}
+.wk-budget__tier small { font-size: 11.5px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--wk-ink-dim); }
+.wk-budget .wk-budget__tier[aria-pressed='true'] {
+  background: var(--wk-accent);
+  color: var(--wk-accent-ink);
+  border-color: var(--wk-accent);
+  box-shadow: var(--wk-shadow-lift);
+}
+.wk-budget .wk-budget__tier[aria-pressed='true'] small { color: rgba(255, 255, 255, 0.8); }
+@media (hover: hover) {
+  .wk-budget .wk-budget__tier:hover:not(:disabled) { border-color: var(--wk-accent); box-shadow: var(--wk-shadow-ring); }
+  .wk-budget .wk-budget__tier[aria-pressed='true']:hover:not(:disabled) { background: var(--wk-accent-lift); }
+}
+.wk-budget .wk-budget__tier:focus-visible { outline: 2px solid var(--wk-blue); outline-offset: 2px; }
+.wk-budget .wk-budget__tier:active:not(:disabled) { transform: translateY(1px); }
+.wk-budget .wk-budget__tier:disabled { opacity: 0.5; cursor: not-allowed; }
+@container (min-width: 460px) {
+  .wk-budget__tiers { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
