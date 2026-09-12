@@ -1,47 +1,90 @@
 # SettleIn
 
-A local web app for planning a multi-item purchase: describe a project, review an AI-generated list, choose products, and prepare shopping links. Payment stays on merchant websites.
+SettleIn helps you buy a lot of things at once.
 
-## Run
+You describe a project in one sentence — *"Furnish an 800 sq ft two-bedroom apartment for two people under $5,000, we already have a sofa"* — and it turns that into a shopping list, searches real retailers for each item, picks a basket that fits your budget, and hands you the links to buy.
 
-Requires Node 22+ and pnpm 11.20.0.
+It does not take your money. SettleIn prepares the basket; you check out on the retailers' own websites.
 
-1. Run `pnpm install`.
-2. Configure `AGENT_API_KEY` or `OPENAI_API_KEY` in the root `.env` or `apps/server/.env`. See `.env.example` for model and retailer settings. Never put secrets in `VITE_*` variables.
-3. Run `pnpm dev` to start both the backend at `http://127.0.0.1:4100` and the panel.
-4. Open `http://127.0.0.1:5173`. For separate processes, use `pnpm dev:server` and `pnpm dev:panel`.
+## What it actually does
 
-The current build is a web app. The source directory retains the name `apps/extension`; `pnpm build` does not produce an installable Chrome extension.
+1. **Turns your sentence into a list.** An AI model breaks the project into item types ("desk", "desk lamp", "bed frame") with quantities, and suggests extras you may have forgotten.
+2. **Searches real stores.** It queries live retailer APIs for every item on the list at once.
+3. **Checks each product actually fits.** Results are compared against your stated constraints — size, material, brand, compatibility, exclusions — with the supporting quotes shown, so a "5 ft desk" doesn't end up in a 4 ft nook. Products that conflict are left out.
+4. **Builds a basket.** It balances fit, quantities, known costs and how many separate stores you'd order from. You can sort for *Recommended*, *Lowest known cost*, or *Fewer stores*.
+5. **Prepares the links.** All selected products appear together with quantities and sellers. You open them and pay at each merchant.
 
-## Workflow
+You can run it two ways: **Let the agent find everything** (it does all five steps unattended) or **Choose item by item** (you review and edit the list before any searching happens).
 
-1. Choose **Choose item by item** to review the list first, or **Let the agent find everything** to build the list, search every category, optimize the complete basket, and prepare shopping links automatically. A budget is optional in agent mode; missing matches receive one follow-up search, and unresolved constraints remain visible instead of being silently skipped. Enter one prompt, such as “Furnish an 800 sq ft, two-bedroom apartment for two people under $5,000. We already have a sofa.”
-2. In agent mode, wait for the prepared basket; the agent handles searching and selection with or without a budget. In item-by-item mode, review the generated item types. Change quantities, remove items, add missing items, and enter a budget. A delivery date is optional.
-3. Choose **Find products for this list**. Categories without results remain visible. Choose **Skip category** to exclude one from the basket, or **Undo skip** to require it again. Skips survive reload and appear in the final basket summary; a new search resets them. At least one product is required to prepare shopping links. Use **Edit list and budget** to revise the list and search again.
-4. Agent picks balance fit and known costs across the whole list; use **Edit list and budget** to revise them. Unskipped missing products and budget issues still block approval. Open a product preview and choose an alternative. Locked products must be unlocked before replacement.
-5. Choose **Prepare shopping links**. The unified basket shows all selected products together across retailers, with quantities, seller labels, and a combined product subtotal. Open **Basket** to review before preparation. Prepared carts appear as checkout actions; other products retain seller links. Check quantities, availability, delivery, taxes, and shipping at the merchant before paying.
+Nothing is hidden from you along the way. Items that no store could match stay visible instead of being quietly dropped, and budget problems block approval rather than being rounded away.
 
-**Edit prompt** reopens the original prompt. Updating it generates a new list and invalidates previous product selections and approval. **New project** starts a separate project. Reload restores the saved project and shopping mode; old snapshots receive missing field defaults instead of crashing the UI.
+## Requirements
 
-## Integration and limits
+- Node 22 or newer
+- pnpm 11.20.0
+- An API key for an OpenAI-compatible model
 
-- The frontend uses `@ag-ui/client` directly for state snapshots and streamed errors. CopilotKit is deliberately not a dependency: this is a staged shopping flow driven by a structured `Decision` union, not a chat surface, so its chat and generative-UI hooks do not apply. The `@ag-ui/*` packages are pinned to exact versions because they are pre-1.0 and ship breaking changes in patch releases.
-- AI checklist generation uses the Responses API with a strict Zod-backed output schema and requires server-side model credentials. Provider failures, refusals, and incomplete responses appear in the UI and preserve the prompt for retry.
-- The checklist prompt favors a minimal list and concise searches that preserve explicit size, compatibility, material, brand, and exclusions. It generates optional extras in the same call. Live discovery uses checklist queries directly, then assesses product fit against retailer titles, descriptions and selected variants using structured AI output. Conflicting products are excluded from recommendations; missing or failed evidence stays unverified. Product previews show the requirement checks and supporting quotes.
-- Live search adapters include Shopify Global Catalog, Shopify Storefront, Walmart Affiliate, and Best Buy. All configured sources run together. Set `SHOPIFY_GLOBAL_CATALOG=1` for cross-merchant Shopify suggestions; Walmart and Best Buy additionally need their own credentials from `.env.example`. Restart the backend after changing configuration.
-- Each retailer displays an offer count and any search failures. Successful results survive another provider failing. Requests time out after 12 seconds, with at most four concurrent queries per source. Empty categories remain editable.
-- Demo products require `ALLOW_MOCK_FALLBACK=1`; without live sources or this explicit opt-in, search reports a configuration error. Prices are compared in USD; known non-USD offers are excluded.
-- Product links are not verified session carts or reservations. The configured Shopify Storefront integration can create and read back a cart; other paths prepare merchant links.
-- Basket recommendations compare fit, required quantities, known item/tax/shipping costs and merchant count. Choose Recommended, Lowest known cost or Fewer stores, then **Apply this basket** to replace unlocked selections. Locked products survive searches and remain blockers if unavailable. Budget checks include all known costs; unquoted tax/shipping keeps the final total unknown. A missing delivery estimate is not a delivery guarantee. See [fit and optimization design](docs/fit-optimization.md) and [UI design](docs/ui-design.md).
-- This is a local, single-user prototype. Server state is stored under `apps/server/.data` by default. Checkout and payment remain manual.
+## Run it
 
-## Verification
+```sh
+pnpm install
+cp .env.example .env
+```
+
+Open `.env` and set your model key:
+
+```sh
+AGENT_API_KEY=sk-your-key-here
+```
+
+That's the only value you must change. `.env.example` already enables Shopify Global Catalog, which searches across many stores and needs no retailer credentials of its own.
+
+Then start it:
+
+```sh
+pnpm dev
+```
+
+Open **http://127.0.0.1:5173**. The backend runs alongside it on port 4100.
+
+To run the two halves in separate terminals, use `pnpm dev:server` and `pnpm dev:panel`. Restart the backend after any `.env` change.
+
+> **Never put a secret in a `VITE_*` variable.** Anything prefixed `VITE_` is compiled into the browser bundle and is public.
+
+## Adding more retailers
+
+Shopify Global Catalog works out of the box. The others need their own free credentials, set in `.env`:
+
+| Source | Variables | Notes |
+| --- | --- | --- |
+| Shopify Global Catalog | `SHOPIFY_GLOBAL_CATALOG=1` | On by default. No account needed. |
+| Best Buy | `BESTBUY_API_KEY` | Fastest way to add real product data. |
+| Walmart | `WALMART_CONSUMER_ID`, `WALMART_PRIVATE_KEY_PEM`, … | Search only — no cart. |
+| Shopify Storefront | `SHOPIFY_STORE_DOMAIN`, `SHOPIFY_STOREFRONT_TOKEN` | Only if you own a store. The one path that builds a real, verified cart. |
+
+Every configured source runs together, each showing its own result count and any failures. One retailer going down doesn't lose the others' results. Searches time out after 12 seconds.
+
+If no source is configured, search reports a configuration error rather than inventing products. Set `ALLOW_MOCK_FALLBACK=1` to use demo products instead — it is off by default on purpose.
+
+## Developing
 
 ```sh
 pnpm typecheck
-pnpm test
-pnpm test:e2e
+pnpm test        # unit tests
+pnpm test:e2e    # browser tests, needs Google Chrome installed
 pnpm build
 ```
 
-Browser tests run isolated servers on ports 4319 and 5319 with controlled external-provider responses. They exercise the real HTTP workflow and persistence through prompt, list editing, product selection, shopping links, reload, prompt revision, provider failure, and missing-product recovery. These tests do not prove live model credentials, retailer availability, or completed purchases. The obsolete extension-only test is skipped when no extension manifest exists.
+The browser tests run their own isolated servers on ports 4319 and 5319 with scripted retailer responses, covering the real workflow end to end: prompt, list editing, product selection, links, reload, provider failure and recovery. They do not prove that live model credentials or real retailer availability work.
+
+The panel source lives in `apps/extension`, but this is a plain web app — the directory name is historical, and `pnpm build` does not produce an installable Chrome extension.
+
+## Limits worth knowing
+
+- **This is a local, single-user prototype.** State is stored on disk under `apps/server/.data`.
+- **Prepared links are not reservations.** A price, stock level or delivery estimate can change before you check out. Confirm quantities, tax and shipping at the merchant before paying.
+- **Unquoted tax and shipping mean the final total is unknown**, so a basket that looks under budget may not be.
+- Prices are compared in USD; offers known to be in other currencies are excluded.
+- Checklist generation requires the model and has no offline fallback. If the provider fails or refuses, the error is shown and your prompt is kept so you can retry.
+
+Design notes: [fit and optimization](docs/fit-optimization.md) · [UI design](docs/ui-design.md)
