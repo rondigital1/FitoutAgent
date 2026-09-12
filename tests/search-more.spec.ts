@@ -3,8 +3,8 @@ import { test, expect } from '@playwright/test';
 test('different options refreshes only one category and survives reload', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('textbox').fill('office under $1500');
-  await page.getByRole('button', { name: 'Make my list' }).click();
-  await page.getByRole('button', { name: 'Find products for this list' }).click();
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByRole('button', { name: 'Find products' }).click();
   const shelf = page.locator('.wk-shelf').first();
   const more = shelf.getByRole('button', { name: /Find different options for/ });
   await expect(more).toBeEnabled();

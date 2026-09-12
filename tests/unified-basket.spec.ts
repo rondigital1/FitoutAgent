@@ -3,10 +3,10 @@ import { test, expect } from '@playwright/test';
 test('one basket shows mixed retailers before preparation and after reload', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('textbox').fill('office under $1500 mixed retailers');
-  await page.getByRole('button', { name: 'Make my list' }).click();
-  await page.getByRole('button', { name: 'Find products for this list' }).click();
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByRole('button', { name: 'Find products' }).click();
   await expect(page.getByRole('status')).toHaveText('Compare');
-  await page.getByRole('button', { name: 'Basket', exact: true }).click();
+  await page.getByRole('button', { name: 'Cart', exact: true }).click();
   const basket = page.getByRole('region', { name: 'Unified basket' });
   await expect(basket).toBeVisible();
   await expect(basket.getByRole('listitem')).toHaveCount(5);
@@ -22,7 +22,7 @@ test('one basket shows mixed retailers before preparation and after reload', asy
   await page.setViewportSize({ width: 1280, height: 1000 });
   await page.screenshot({ path: 'test-results/unified-basket-desktop.png', fullPage: true });
   await page.reload();
-  await expect(page.getByRole('heading', { name: 'Your basket', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Your cart', exact: true })).toBeVisible();
   await expect(basket.getByRole('listitem')).toHaveCount(5);
   await expect(basket.getByRole('link', { name: 'View at seller' })).toHaveCount(5);
 });
