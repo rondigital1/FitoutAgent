@@ -1,9 +1,17 @@
-import { evaluate, type Retailer, type State } from '@settlein/shared';
+import { evaluate, type Retailer, type State } from '@fitoutagent/shared';
 
 import { optimize } from './optimizer';
+import { finishRecovery, unresolved } from './recovery/status';
 
 /** Preserve explicit choices while offering whole-basket alternatives. */
 export function compare(s: State, reset = false) {
+  for (const [id, result] of Object.entries(s.searchRecovery ?? {})) {
+    const item = s.requirements?.items.find(item => item.id === id);
+    if (item && !unresolved(s, item)) finishRecovery(s, item, result);
+    else if (result.status === 'locked' && !s.offers.some(o => o.checklistItemId === id && s.locks.includes(o.id))) {
+      result.status = 'unverified'; result.message = 'The product is unlocked. Retry the search to find a suitable replacement.';
+    }
+  }
   const r = { ...s.requirements!, items: s.requirements!.items.filter(item => !s.skippedItemIds.includes(item.id)) };
   const recommended = optimize(r, s.offers, s.locks, 'fit');
   if (reset || !s.selected.length) s.selected = recommended.productIds;
@@ -43,7 +51,7 @@ export function nextBasket(s: State) {
       const o = s.offers.find(o => o.id === id)!;
       const item = s.requirements!.items.find(i => i.id === o.checklistItemId)!;
       if (o.retailer !== retailer) return [];
-      return [{ id: o.id, quantity: item.quantity, owner: 'settlein' as const }];
+      return [{ id: o.id, quantity: item.quantity, owner: 'fitoutagent' as const }];
     }),
   };
 }

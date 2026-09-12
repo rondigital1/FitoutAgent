@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ItemIcon } from './ui/ItemIcon';
 import { BudgetSelector } from './ui/BudgetSelector';
-import { ChecklistItem, GoalDraft, type Requirements, type Suggestion } from '@settlein/shared';
+import { ChecklistItem, GoalDraft, type Requirements, type Suggestion } from '@fitoutagent/shared';
 
 export function ChecklistReview({ setupId, requirements, suggestions, disabled, onConfirm }: {
   setupId: string;
@@ -10,7 +10,7 @@ export function ChecklistReview({ setupId, requirements, suggestions, disabled, 
   disabled: boolean;
   onConfirm(items: ChecklistItem[], budget: number | null, deadline: string | null): void;
 }) {
-  const storageKey = `settlein-review-${setupId}`;
+  const storageKey = `fitoutagent-review-${setupId}`;
   const [savedReview] = useState(() => {
     const defaults = {
       items: requirements.items,
@@ -89,11 +89,11 @@ export function ChecklistReview({ setupId, requirements, suggestions, disabled, 
             onClick={() => setItems(prev => [...prev, { id: s.id, label: s.label, query: s.query, quantity: s.defaultQty, must: false }])}>Add</button>
         </div>)}
       </details>}
-      </div><aside className="wk-review__search" aria-label="Search settings"><div className="wk-review__search-heading"><span className="wk-label">Next step</span><h2>Find your products</h2><p>Set your budget, then explore options for your list.</p></div>
+      </div><aside className="wk-review__search" aria-label="Search settings"><div className="wk-review__search-heading"><span className="wk-label">Next step</span><h2>Ready to shop</h2><p>Set a budget, then search products for this list.</p></div>
         <BudgetSelector value={budget} onChange={setBudget} />
         <details><summary>Delivery date · optional</summary><label><span className="wk-label">Needed by</span><input type="date" value={deadline} onChange={e => setDeadline(e.target.value)} /></label></details>
         {error && <p role="alert">{error}</p>}
-        <button type="submit" className="primary" disabled={disabled || !items.length}>{disabled ? 'Finding products…' : 'Find products for this list'}</button>
+        <button type="submit" className="primary" disabled={disabled || !items.length}>{disabled ? 'Searching…' : 'Find products'}</button>
       </aside></div>
     </fieldset>
   </form>;

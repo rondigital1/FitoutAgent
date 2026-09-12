@@ -11,7 +11,7 @@ body {
 
 h1, h2, h3, h4 {
   margin: 0;
-  font-weight: 650;
+  font-weight: 550;
   letter-spacing: -0.02em;
   color: var(--wk-ink);
 }
@@ -72,9 +72,10 @@ button.primary:hover:not(:disabled) {
   box-shadow: var(--wk-shadow-lift);
 }
 button.primary:disabled {
-  background: var(--wk-surface-3);
-  border-color: var(--wk-surface-3);
-  color: var(--wk-ink-faint);
+  background: #8eb0e2;
+  border-color: #8eb0e2;
+  color: #ffffff;
+  opacity: 1;
 }
 
 button.btn-quiet {
@@ -127,14 +128,14 @@ input[type='number'] { font-variant-numeric: tabular-nums; }
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 10.5px;
-  font-weight: 650;
-  letter-spacing: 0.03em;
-  color: var(--wk-ink-dim);
-  background: var(--wk-surface-2);
-  border: 1px solid var(--wk-line);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--wk-ink);
+  background: var(--wk-surface);
+  border: 1px solid var(--wk-line-strong);
   border-radius: 999px;
-  padding: 3px 9px;
+  padding: 2px 8px;
 }
 .chip--ok { color: var(--wk-ok); background: var(--wk-ok-soft); border-color: rgba(15, 113, 69, 0.22); }
 .chip--warn { color: var(--wk-warn); background: var(--wk-warn-soft); border-color: rgba(138, 90, 0, 0.24); }

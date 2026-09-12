@@ -1,4 +1,4 @@
-import type { State } from '@settlein/shared';
+import type { State } from '@fitoutagent/shared';
 import { compare } from './planning';
 import { eligible } from './optimizer';
 

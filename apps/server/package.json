@@ -1,5 +1,5 @@
 {
-  "name": "@settlein/server",
+  "name": "@fitoutagent/server",
   "private": true,
   "type": "module",
   "scripts": {
@@ -12,7 +12,7 @@
   "dependencies": {
     "@ag-ui/core": "0.0.59",
     "@ag-ui/encoder": "0.0.59",
-    "@settlein/shared": "workspace:*",
+    "@fitoutagent/shared": "workspace:*",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "openai": "^7.15.0",

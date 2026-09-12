@@ -1,4 +1,4 @@
-import { ChecklistItem, Suggestion, type DecomposeTool } from '@settlein/shared';
+import { ChecklistItem, Suggestion, type DecomposeTool } from '@fitoutagent/shared';
 import OpenAI from 'openai';
 import { zodTextFormat } from 'openai/helpers/zod';
 import { ZodError } from 'zod';
@@ -45,7 +45,7 @@ export const llmDecomposer: DecomposeTool = {
       store: false,
       ...(model.startsWith('gpt-5') ? { reasoning: { effort: 'none' as const } } : {}),
       text: {
-        format: zodTextFormat(DecomposeStructuredLlmSchema, 'settlein_checklist'),
+        format: zodTextFormat(DecomposeStructuredLlmSchema, 'fitoutagent_checklist'),
       },
     }).catch((error: unknown) => {
       if (error instanceof ZodError) {

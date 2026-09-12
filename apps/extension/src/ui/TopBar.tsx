@@ -1,4 +1,4 @@
-import type { State } from '@settlein/shared';
+import type { State } from '@fitoutagent/shared';
 
 export type StageId = 'setup' | 'checklist' | 'shop' | 'baskets';
 
@@ -6,16 +6,16 @@ const STAGES: { id: StageId; label: string }[] = [
   { id: 'setup', label: 'Project' },
   { id: 'checklist', label: 'Checklist' },
   { id: 'shop', label: 'Shop' },
-  { id: 'baskets', label: 'Basket' },
+  { id: 'baskets', label: 'Cart' },
 ];
 
 const PHASE_TEXT: Record<State['phase'], string> = {
   idle: 'Ready',
-  checklist: 'Review checklist',
-  discover: 'Searching',
+  checklist: 'List',
+  discover: 'Search',
   compare: 'Compare',
-  prepare: 'Preparing',
-  verify: 'Verifying',
+  prepare: 'Cart',
+  verify: 'Verify',
   complete: 'Done',
 };
 
@@ -46,12 +46,12 @@ export function TopBar({
     <header className="wk-top">
       <div className="wk-top__row">
         <div className="wk-wordmark">
-          <span className="wk-wordmark__glyph" aria-hidden>S</span>
-          SettleIn
+          <span className="wk-wordmark__glyph" aria-hidden>F</span>
+          FitoutAgent
         </div>
         <span className={`wk-phase wk-phase--${tone}`} role="status">
           <span className="wk-phase__dot" aria-hidden />
-          {paused ? 'Paused' : busy ? 'Working' : PHASE_TEXT[phase]}
+          {paused ? 'Paused' : busy ? 'Updating' : PHASE_TEXT[phase]}
         </span>
         {phase !== 'idle' && (
           <button type="button" className="btn-quiet" disabled={pauseDisabled} onClick={onPauseToggle}>

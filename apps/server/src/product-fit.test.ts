@@ -1,6 +1,6 @@
 import { test, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
-import { Offer, type Requirements } from '@settlein/shared';
+import { Offer, type Requirements } from '@fitoutagent/shared';
 import { validateAssessment } from './fit/assessment';
 import { fitVerifier } from './fit/verify';
 

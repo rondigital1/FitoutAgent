@@ -6,7 +6,7 @@ process.env.SHOPIFY_GLOBAL_CATALOG = '0';
 process.env.ALLOW_MOCK_FALLBACK = '1';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { initialState, evaluate, type GoalDraft, type CartResult } from '@settlein/shared';
+import { initialState, evaluate, type GoalDraft, type CartResult } from '@fitoutagent/shared';
 import { transition } from './workflow';
 import { mockCart } from '../../extension/src/mock-cart';
 import { activeDiscoverySources, compositeDiscovery } from './discovery/composite';

@@ -1,6 +1,6 @@
 import { test, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
-import { initialState, Requirements } from '@settlein/shared';
+import { initialState, Requirements } from '@fitoutagent/shared';
 import { categorySearchPlanner } from './discovery/category-search-plan';
 
 const env = { ...process.env };

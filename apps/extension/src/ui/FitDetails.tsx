@@ -1,4 +1,4 @@
-import type { Offer } from '@settlein/shared';
+import type { Offer } from '@fitoutagent/shared';
 
 export const fitLabel = (offer: Offer) => offer.fit?.status === 'verified' ? 'Fit supported'
   : offer.fit?.status === 'rejected' ? 'Does not fit' : 'Fit needs review';

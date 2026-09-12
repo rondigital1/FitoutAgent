@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { money, type Offer } from '@settlein/shared';
+import { money, type Offer } from '@fitoutagent/shared';
 import { OfferImage } from './ProductTile';
 import { RetailerMark } from './RetailerMark';
 import { FitDetails, fitLabel } from './FitDetails';

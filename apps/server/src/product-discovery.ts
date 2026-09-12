@@ -1,7 +1,7 @@
-import { type Requirements, type State } from '@settlein/shared';
+import { type Requirements, type State } from '@fitoutagent/shared';
 import { activeDiscoverySources, compositeDiscovery } from './discovery/composite';
 import { mockRefresh } from './mock-tools';
-import { eligible } from './optimizer';
+import { recoverSearch } from './recovery/run';
 import { compare, nextBasket } from './planning';
 import { fitVerifier } from './fit/verify';
 
@@ -21,6 +21,7 @@ async function discover(s: State, requirements: Requirements, emit: Emit) {
   }
 
   s.requirements = requirements;
+  s.searchRecovery = {};
   s.categorySearchHistory = {};
   s.searchingItemId = null;
   s.skippedItemIds = []; s.removedBasketProducts = [];
@@ -44,21 +45,7 @@ async function discover(s: State, requirements: Requirements, emit: Emit) {
   s.offers = hasMock ? await mockRefresh.refresh(s.offers) : s.offers;
   await checkpoint('discover', `Checking product fit for ${s.offers.length} offers…`);
   s.offers = await fitVerifier.verify(requirements, s.offers);
-  if (requirements.selectionMode === 'agent') {
-    const missing = requirements.items.filter(item => !s.offers.some(o => o.checklistItemId === item.id && eligible(o, requirements) && o.price !== null));
-    if (missing.length) {
-      await checkpoint('discover', `Searching again for ${missing.map(item => item.label).join(', ')}…`);
-      try {
-        const retry = await compositeDiscovery.discover({ ...requirements, items: missing });
-        const checked = await fitVerifier.verify(requirements, retry);
-        const merged = new Map(s.offers.map(o => [o.id, o]));
-        checked.forEach(o => merged.set(o.id, o));
-        s.offers = [...merged.values()];
-      } catch {
-        s.log.push('The follow-up search failed. Keeping the products already found.');
-      }
-    }
-  }
+  await recoverSearch(s, emit);
   await checkpoint('discover', 'Optimizing the whole basket for fit, quantities, budget and known costs…');
   s.log.push(`Fit assessment: ${s.offers.filter(o => o.fit?.status === 'verified').length} supported, ${s.offers.filter(o => o.fit?.status === 'rejected').length} rejected, ${s.offers.filter(o => o.fit?.status === 'unknown').length} need review.`);
   compare(s, true);
@@ -68,7 +55,7 @@ async function discover(s: State, requirements: Requirements, emit: Emit) {
     : `Found ${s.offers.length} offers. Review plans before preparing baskets.`);
   if (requirements.selectionMode === 'agent') {
     const plan = s.plans[0];
-    if (!s.replacement && plan && !plan.issues.length) {
+    if (!s.replacement && plan && !plan.issues.length && Object.values(s.searchRecovery ?? {}).every(result => result.status === 'resolved')) {
       s.approved = plan.id;
       s.selected = [...plan.productIds];
       s.phase = 'prepare';
@@ -76,7 +63,7 @@ async function discover(s: State, requirements: Requirements, emit: Emit) {
       nextBasket(s);
       await emit(s);
     } else {
-      s.log.push(`The agent needs help with: ${plan?.issues.join('; ') || 'an unavailable locked product'}. Your matches are saved.`);
+      s.log.push(`The agent needs help with: ${plan?.issues.join('; ') || Object.values(s.searchRecovery ?? {}).filter(result => result.status !== 'resolved').map(result => result.message).join('; ') || 'an unavailable locked product'}. Your matches are saved.`);
       await emit(s);
     }
   }

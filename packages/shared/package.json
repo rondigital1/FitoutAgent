@@ -1,1 +1,1 @@
-{"name":"@settlein/shared","version":"0.0.0","private":true,"type":"module","exports":"./src/index.ts","scripts":{"build":"tsc --noEmit","typecheck":"tsc --noEmit"},"dependencies":{"zod":"^3.25.76"},"devDependencies":{"typescript":"^5.9.3"}}
+{"name":"@fitoutagent/shared","version":"0.0.0","private":true,"type":"module","exports":"./src/index.ts","scripts":{"build":"tsc --noEmit","typecheck":"tsc --noEmit"},"dependencies":{"zod":"^3.25.76"},"devDependencies":{"typescript":"^5.9.3"}}

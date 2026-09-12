@@ -1,6 +1,6 @@
 import { fetchRetailer, searchItems } from './runtime';
 import { createSign } from 'node:crypto';
-import type { DiscoveryTool, Offer, Requirements } from '@settlein/shared';
+import type { DiscoveryTool, Offer, Requirements } from '@fitoutagent/shared';
 
 /** FACT: Walmart Affiliate Marketing API — search/items, not cart.
  * https://walmart.io/apidocs/affiliates/affiliate-marketing-api

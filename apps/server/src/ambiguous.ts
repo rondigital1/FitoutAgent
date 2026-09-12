@@ -1,6 +1,6 @@
 import { mkdir, readFile, writeFile, rename } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { restoreState, type State } from '@settlein/shared';
+import { restoreState, type State } from '@fitoutagent/shared';
 /** Server-only seam. No vendor API is assumed. TODO: implement the confirmed Ambiguous contract. */
 export interface AmbiguousAdapter { saveSetupPlan(state: State): Promise<void>; loadSetupPlan(id: string): Promise<State | null> }
 export class LocalAmbiguousAdapter implements AmbiguousAdapter {

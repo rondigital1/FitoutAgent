@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
 import { zodTextFormat } from 'openai/helpers/zod';
 import { z } from 'zod';
-import type { ChecklistItem, State } from '@settlein/shared';
+import type { ChecklistItem, State } from '@fitoutagent/shared';
 import { activeDiscoverySources } from './composite';
 
 const SearchPlan = z.object({

@@ -10,5 +10,6 @@ export const ProductFit = z.object({
   checks: z.array(FitCheck).max(20),
   summary: z.string().max(300),
   assessedAt: z.string(),
+  failure: z.enum(['credentials', 'provider']).optional(),
 });
 export type ProductFit = z.infer<typeof ProductFit>;

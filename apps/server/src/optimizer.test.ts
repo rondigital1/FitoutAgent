@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Offer, evaluate, initialState, restoreState, type Requirements } from '@settlein/shared';
+import { Offer, evaluate, initialState, restoreState, type Requirements } from '@fitoutagent/shared';
 import { optimize } from './optimizer';
 import { compare } from './planning';
 import { transition } from './workflow';

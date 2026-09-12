@@ -1,4 +1,4 @@
-import type { DiscoveryIssue, Offer, Requirements } from '@settlein/shared';
+import type { DiscoveryIssue, Offer, Requirements } from '@fitoutagent/shared';
 
 /** Bound retailer requests so a slow provider cannot leave the search spinning forever. */
 export async function fetchRetailer(url: string | URL, init: RequestInit = {}) {

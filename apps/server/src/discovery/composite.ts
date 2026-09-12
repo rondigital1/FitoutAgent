@@ -1,4 +1,4 @@
-import { Offer, type DiscoveryReport, type DiscoveryTool, type Requirements } from '@settlein/shared';
+import { Offer, type DiscoveryReport, type DiscoveryTool, type Requirements } from '@fitoutagent/shared';
 import { bestBuyDiscovery, bestBuyEnabled } from './bestbuy';
 import { shopifyDiscovery, shopifyEnabled } from './shopify';
 import { shopifyGlobalCatalogDiscovery, shopifyGlobalCatalogEnabled } from './shopify-global-catalog';

@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { GoalDraft, type SelectionMode, type State } from '@settlein/shared';
+import { GoalDraft, type SelectionMode, type State } from '@fitoutagent/shared';
 
 export function SetupForm({ state, submitting, onStart }: {
   state: State;
   submitting: boolean;
   onStart(draft: GoalDraft): void;
 }) {
-  const storageKey = `settlein-prompt-${state.id}`;
+  const storageKey = `fitoutagent-prompt-${state.id}`;
   const [saved] = useState(() => {
     try {
       const value = JSON.parse(localStorage.getItem(storageKey) ?? 'null');
@@ -21,12 +21,17 @@ export function SetupForm({ state, submitting, onStart }: {
     try { localStorage.setItem(storageKey, JSON.stringify({ baseGoal: state.draft?.goal ?? '', goal, selectionMode })); } catch { /* Keep editing in memory. */ }
   }, [storageKey, state.draft?.goal, goal, selectionMode]);
   const [error, setError] = useState('');
+  const improved = state.draft?.originalGoal && state.draft.originalGoal !== state.draft.goal;
   return (
     <form
       className="wk-form"
       onSubmit={event => {
         event.preventDefault();
-        const parsed = GoalDraft.safeParse({ ...(state.phase === 'idle' && goal.trim() === state.draft?.goal ? state.draft : {}), goal: goal.trim(), selectionMode });
+        const parsed = GoalDraft.safeParse({
+          ...(state.phase === 'idle' && goal.trim() === state.draft?.goal ? state.draft : {}),
+          goal: goal.trim(),
+          selectionMode,
+        });
         if (!parsed.success) {
           setError(parsed.error.issues[0]?.message ?? 'Enter what you need.');
           return;
@@ -36,7 +41,7 @@ export function SetupForm({ state, submitting, onStart }: {
       }}
     >
       <label>
-        <span className="wk-label">What do you need?</span>
+        <span className="wk-label">Describe your project</span>
         <textarea
           name="goal"
           value={goal}
@@ -50,25 +55,40 @@ export function SetupForm({ state, submitting, onStart }: {
         />
       </label>
       <p className="wk-form__hint">
-        Describe the project. Mention your budget, preferences, and things you already own.
+        Include budget, preferences, and anything you already own.
       </p>
+      {improved && state.phase === 'idle' && (
+        <p className="wk-notice" role="status">
+          Improved from: <em>{state.draft!.originalGoal}</em>
+        </p>
+      )}
       <fieldset className="wk-mode" disabled={submitting}>
-        <legend className="wk-label">How would you like to shop?</legend>
+        <legend className="wk-label">Shopping mode</legend>
         <label className="wk-mode__option">
           <input type="radio" name="selectionMode" value="manual" checked={selectionMode === 'manual'} onChange={() => setSelectionMode('manual')} />
-          <span><strong>Choose item by item</strong><small>Edit the list first, then compare products by category.</small></span>
+          <span>
+            <strong>Choose item by item</strong>
+            <small>Edit the list first, then compare products by category.</small>
+          </span>
         </label>
         <label className="wk-mode__option">
           <input type="radio" name="selectionMode" value="agent" checked={selectionMode === 'agent'} onChange={() => setSelectionMode('agent')} />
-          <span><strong>Let the agent find everything</strong><small>Search every category, optimize the basket and prepare shopping links automatically.</small></span>
+          <span>
+            <strong>Handle it for me</strong>
+            <small>Improve your prompt, build the list, search products, optimize the basket, and prepare checkout links — you only pay on the merchant site.</small>
+          </span>
         </label>
       </fieldset>
-      {selectionMode === 'agent' && <p className="wk-form__hint">One prompt is enough. Add a budget if you have one; the agent handles the list, product search and basket. You choose when to check out.</p>}
+      {selectionMode === 'agent' && (
+        <p className="wk-form__hint">
+          One prompt is enough. The agent will clarify it, shop across categories, and hand you merchant links.
+        </p>
+      )}
       {error && <p className="wk-notice wk-notice--alert" role="alert">{error}</p>}
       <button className="primary" type="submit" disabled={submitting || !goal.trim()}>
         {selectionMode === 'agent'
-          ? submitting ? 'Finding your products…' : 'Find everything for me'
-          : submitting ? 'Building your list…' : state.draft ? 'Update my list' : 'Make my list'}
+          ? submitting ? 'Handling it for you…' : 'Handle it for me'
+          : submitting ? 'Building list…' : state.draft ? 'Update list' : 'Continue'}
       </button>
     </form>
   );

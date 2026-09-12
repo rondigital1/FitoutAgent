@@ -22,7 +22,7 @@ export function loadEnv() {
       }
       if (process.env[key] === undefined) process.env[key] = value;
     }
-    console.log(`SettleIn: loaded env from ${file}`);
+    console.log(`FitoutAgent: loaded env from ${file}`);
     break;
   }
 }

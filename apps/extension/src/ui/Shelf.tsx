@@ -1,4 +1,4 @@
-import { money, type ChecklistItem, type Offer } from '@settlein/shared';
+import { money, type ChecklistItem, type Offer } from '@fitoutagent/shared';
 import { ProductTile } from './ProductTile';
 import { shelfFacts, tileEmphasis } from './shelf-emphasis';
 

@@ -21,20 +21,20 @@ export function extReloadPlugin(): Plugin {
       res.end();
     });
     server.listen(PORT, "127.0.0.1", () => {
-      console.log(`[settlein-reload] watching on http://127.0.0.1:${PORT}/version`);
+      console.log(`[fitoutagent-reload] watching on http://127.0.0.1:${PORT}/version`);
     });
     server.on("error", (err: NodeJS.ErrnoException) => {
       if (err.code === "EADDRINUSE") {
-        console.log(`[settlein-reload] port ${PORT} already in use — another watch is fine`);
+        console.log(`[fitoutagent-reload] port ${PORT} already in use — another watch is fine`);
         server = null;
       } else {
-        console.warn("[settlein-reload]", err.message);
+        console.warn("[fitoutagent-reload]", err.message);
       }
     });
   };
 
   return {
-    name: "settlein-ext-reload",
+    name: "fitoutagent-ext-reload",
     apply: "build",
     buildStart() {
       // Only meaningful under --watch; harmless for one-shot builds.
@@ -42,7 +42,7 @@ export function extReloadPlugin(): Plugin {
     },
     writeBundle() {
       version = Date.now();
-      console.log(`[settlein-reload] build #${version} — extension will auto-reload`);
+      console.log(`[fitoutagent-reload] build #${version} — extension will auto-reload`);
     },
     closeBundle() {
       // keep server alive across watch rebuilds

@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 import { zodTextFormat } from 'openai/helpers/zod';
-import type { Offer, Requirements } from '@settlein/shared';
+import type { Offer, Requirements } from '@fitoutagent/shared';
 import { Assessment, FIT_SYSTEM, unknownFit, validateAssessment } from './assessment';
 
 /** Batches of 20 offers per shopping line, at most three concurrent calls. No invented fallback verdicts. */
@@ -16,7 +16,7 @@ export const fitVerifier = {
         const item = requirements.items[next++];
         const candidates = offers.filter(o => o.checklistItemId === item.id);
         const live = candidates.filter(o => o.source !== 'Mock');
-        for (const offer of candidates) result.set(offer.id, { ...offer, match: 'alternative', fit: unknownFit() });
+        for (const offer of candidates) result.set(offer.id, { ...offer, match: 'alternative', fit: client ? unknownFit() : unknownFit('Fit assessment needs server model credentials. Configure them and retry.', 'credentials') });
         // Demo fixtures are explicitly identified; never label simulated facts as retailer verification.
         for (const offer of candidates.filter(o => o.source === 'Mock')) result.set(offer.id, {
           ...offer, match: 'alternative', fit: unknownFit('Demo product: specifications are simulated and need review.'),
@@ -30,7 +30,7 @@ export const fitVerifier = {
               ...(model.startsWith('gpt-5') ? { reasoning: { effort: 'none' as const } } : {}),
               input: JSON.stringify({ goal: requirements.goal, owned: requirements.owned, item,
                 offers: batch.map(o => ({ id: o.id, name: o.name, description: o.description ?? '', variant: o.variant ?? '', brand: o.brand })) }),
-              text: { format: zodTextFormat(Assessment, 'settlein_product_fit') },
+              text: { format: zodTextFormat(Assessment, 'fitoutagent_product_fit') },
             });
             if (response.status !== 'completed' || !response.output_parsed) throw new Error('Incomplete assessment');
             const fits = validateAssessment(response.output_parsed, batch);
@@ -39,7 +39,7 @@ export const fitVerifier = {
               result.set(offer.id, { ...offer, fit, match: fit.status === 'verified' ? 'exact' : 'alternative' });
             }
           } catch {
-            for (const offer of batch) result.set(offer.id, { ...offer, match: 'alternative', fit: unknownFit('Fit assessment failed. Review specifications or search again to retry.') });
+            for (const offer of batch) result.set(offer.id, { ...offer, match: 'alternative', fit: unknownFit('Fit assessment failed. Review specifications or search again to retry.', 'provider') });
           }
         }
       }

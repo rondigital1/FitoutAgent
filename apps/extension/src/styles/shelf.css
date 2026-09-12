@@ -8,7 +8,6 @@
   margin-bottom: 14px;
   transition: box-shadow var(--wk-ease), border-color var(--wk-ease);
 }
-.wk-shelf:hover { box-shadow: var(--wk-shadow-lift); }
 .wk-shelf.is-skipped { background: var(--wk-surface-2); box-shadow: none; }
 .wk-shelf.is-skipped .wk-shelf__name { color: var(--wk-ink-dim); text-decoration: line-through; }
 
@@ -37,16 +36,16 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 3px 9px;
+  padding: 2px 8px;
   border-radius: 999px;
-  background: var(--wk-accent-soft);
-  border: 1px solid var(--wk-accent-line);
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  background: var(--wk-surface);
+  border: 1px solid var(--wk-line-strong);
+  font-size: 11px;
+  font-weight: 550;
+  letter-spacing: 0;
+  text-transform: none;
   font-variant-numeric: tabular-nums;
-  color: var(--wk-accent);
+  color: var(--wk-ink);
 }
 .wk-shelf__count.is-empty { background: var(--wk-warn-soft); border-color: rgba(138, 90, 0, 0.24); color: var(--wk-warn); }
 .wk-shelf__qty, .wk-shelf__range {
@@ -90,22 +89,16 @@
 .wk-rail::-webkit-scrollbar-track { background: transparent; }
 .wk-rail > [role='listitem'] { display: grid; min-width: 0; }
 
-/* ---- Loading shimmer while discovery runs ---- */
+/* ---- Loading placeholder ---- */
 .wk-skel {
   border: 1px solid var(--wk-line);
   border-radius: var(--wk-r-lg);
   background: var(--wk-surface);
   overflow: hidden;
 }
-.wk-skel__art { aspect-ratio: 1 / 1; }
-.wk-skel__line { height: 10px; margin: 10px 11px; border-radius: 999px; }
+.wk-skel__art { aspect-ratio: 1 / 1; background: var(--wk-surface-2); }
+.wk-skel__line { height: 10px; margin: 10px 11px; border-radius: 999px; background: var(--wk-surface-2); }
 .wk-skel__line--short { width: 55%; }
-.wk-skel__art, .wk-skel__line {
-  background: linear-gradient(100deg, var(--wk-surface-2) 30%, var(--wk-surface-3) 50%, var(--wk-surface-2) 70%);
-  background-size: 300% 100%;
-  animation: wk-shimmer 1.4s linear infinite;
-}
-@keyframes wk-shimmer { from { background-position: 150% 0; } to { background-position: -150% 0; } }
 
 /* ---- Replacement banner ---- */
 .wk-replace {

@@ -13,7 +13,7 @@
   box-shadow: var(--wk-shadow-pop);
   overflow: hidden;
 }
-.wk-sheet::backdrop { background: rgba(10, 21, 32, 0.5); backdrop-filter: blur(3px); }
+.wk-sheet::backdrop { background: rgba(10, 21, 32, 0.5); }
 .wk-sheet[open] { animation: wk-rise 260ms cubic-bezier(0.16, 1, 0.3, 1); }
 @keyframes wk-rise { from { transform: translateY(18px); opacity: 0; } }
 

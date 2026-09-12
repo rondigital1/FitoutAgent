@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { money, type Offer, type State } from '@settlein/shared';
+import { money, type Offer, type State } from '@fitoutagent/shared';
 import { OfferImage } from './ProductTile';
 import { FitDetails } from './FitDetails';
 
@@ -12,6 +12,7 @@ export function BasketReplacement({ state, offer, disabled, onClose, onReplace }
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   const [failed, setFailed] = useState(false);
+  const [submitting, setSubmitting] = useState<string | null>(null);
   useEffect(() => { ref.current?.showModal(); }, []);
   const locked = state.locks.includes(offer.id);
   const alternatives = state.offers.filter(o => o.checklistItemId === offer.checklistItemId && o.id !== offer.id && o.available && o.fit?.status !== 'rejected' && !(state.requirements?.deadline && o.arrival && o.arrival > state.requirements.deadline));
@@ -21,7 +22,7 @@ export function BasketReplacement({ state, offer, disabled, onClose, onReplace }
         <div className="wk-sheet__body">
           <h2 id="basket-replace-title">Replace {offer.name}</h2>
           <p>Your other basket choices stay the same.</p>
-          {locked && <p className="wk-notice">This choice is locked. Use Edit list and budget, then unlock it from its product details before replacing it.</p>}
+          {locked && <p className="wk-notice">Your new choice will stay locked so the agent keeps it.</p>}
           {!alternatives.length && <p className="wk-notice">No available alternatives yet. Edit the list and search again for more options.</p>}
           {failed && <p role="alert">Could not replace this product. Close this picker to review the error and try again.</p>}
           <ul className="wk-replacement-options">
@@ -29,7 +30,12 @@ export function BasketReplacement({ state, offer, disabled, onClose, onReplace }
               <li key={candidate.id}>
                 <div className="wk-replacement-options__image"><OfferImage offer={candidate} /></div>
                 <div><h3>{candidate.name}</h3><p>{money(candidate.price)} each</p><FitDetails offer={candidate} />
-                  <button className="primary" type="button" disabled={disabled || locked} aria-label={`Use ${candidate.name} instead`} onClick={async () => { setFailed(false); if (!await onReplace(candidate.id)) setFailed(true); }}>Use this instead</button>
+                  <button className="primary" type="button" disabled={disabled || submitting !== null} aria-label={`Use ${candidate.name} instead`} onClick={async () => {
+                    setFailed(false); setSubmitting(candidate.id);
+                    try { if (!await onReplace(candidate.id)) setFailed(true); }
+                    catch { setFailed(true); }
+                    finally { setSubmitting(null); }
+                  }}>{submitting === candidate.id ? 'Replacing…' : 'Use this instead'}</button>
                 </div>
               </li>
             ))}

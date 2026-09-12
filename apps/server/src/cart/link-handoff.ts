@@ -1,4 +1,4 @@
-import type { CartRequest, CartResult, Offer } from '@settlein/shared';
+import type { CartRequest, CartResult, Offer } from '@fitoutagent/shared';
 
 /**
  * For retailers without a sanctioned session-cart API (Walmart Affiliate, Best Buy):

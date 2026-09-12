@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { smartDecomposer } from './discovery/decompose';
-import { initialState } from '@settlein/shared';
+import { initialState } from '@fitoutagent/shared';
 import { transition } from './workflow';
 
 const env = { ...process.env };

@@ -1,5 +1,5 @@
 import { fetchRetailer, searchItems } from './runtime';
-import type { DiscoveryTool, Offer, Requirements } from '@settlein/shared';
+import type { DiscoveryTool, Offer, Requirements } from '@fitoutagent/shared';
 
 /** FACT: Shopify Storefront API search + cart mutations.
  * https://shopify.dev/docs/api/storefront/latest/queries/search

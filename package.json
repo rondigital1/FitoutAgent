@@ -1,17 +1,17 @@
 {
-  "name": "settlein",
+  "name": "fitoutagent",
   "private": true,
   "packageManager": "pnpm@11.20.0",
   "scripts": {
-    "dev": "pnpm --parallel --filter @settlein/server --filter @settlein/extension dev",
+    "dev": "pnpm --parallel --filter @fitoutagent/server --filter @fitoutagent/extension dev",
     "dev:panel": "pnpm --dir apps/extension dev",
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
-    "test": "pnpm --filter @settlein/server test",
+    "test": "pnpm --filter @fitoutagent/server test",
     "test:e2e": "playwright test",
     "watch:ext": "pnpm --dir apps/extension watch",
     "dev:ext": "pnpm --dir apps/extension watch",
-    "dev:server": "pnpm --filter @settlein/server dev"
+    "dev:server": "pnpm --filter @fitoutagent/server dev"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0"

@@ -1,4 +1,4 @@
-import type { DiscoveryReport, State } from '@settlein/shared';
+import type { DiscoveryReport, State } from '@fitoutagent/shared';
 import { compositeDiscovery } from './discovery/composite';
 import { fitVerifier } from './fit/verify';
 import { categorySearchPlanner } from './discovery/category-search-plan';

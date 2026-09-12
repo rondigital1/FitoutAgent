@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { BasketItemControls } from './BasketItemControls';
 import { BasketReplacement } from './BasketReplacement';
-import { merchantKey, money, proxiedImage, type State } from '@settlein/shared';
+import { merchantKey, money, proxiedImage, type State } from '@fitoutagent/shared';
 import { agentBase } from '../agent-base';
 import { ProductArt } from './ProductArt';
 import { RetailerMark, retailerLabel } from './RetailerMark';

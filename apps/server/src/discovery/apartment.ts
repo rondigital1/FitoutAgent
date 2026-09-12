@@ -1,4 +1,4 @@
-import type { ChecklistItem } from '@settlein/shared';
+import type { ChecklistItem } from '@fitoutagent/shared';
 
 export const isApartment = (goal: string) => /apartment|\bapt\b|\b[1-9]\s*[- ]?\s*(?:br|bedroom)|furnish(?:ing)?\s+(?:a\s+)?(?:home|house|place)(?!\s*office)/i.test(goal) && !/office|desk|wfh|workspace|work from home/i.test(goal);
 

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { initialState, restoreState, type State } from '@settlein/shared';
+import { initialState, restoreState, type State } from '@fitoutagent/shared';
 
 /**
  * Every State key, populated with a non-default, schema-valid value.
@@ -96,14 +96,14 @@ const FULL: Required<State> = {
   pending: {
     id: 'cart-1',
     retailer: 'Shopify',
-    lines: [{ id: 'offer-1', quantity: 2, owner: 'settlein' }],
+    lines: [{ id: 'offer-1', quantity: 2, owner: 'fitoutagent' }],
     operation: 'prepare-and-verify',
   },
   baskets: [{
     id: 'cart-0',
     retailer: 'Walmart',
     verified: true,
-    lines: [{ id: 'offer-2', quantity: 1, owner: 'settlein' }],
+    lines: [{ id: 'offer-2', quantity: 1, owner: 'fitoutagent' }],
     mock: false,
     checkoutUrl: 'https://example.com/checkout',
   }],

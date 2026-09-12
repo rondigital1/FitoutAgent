@@ -6,6 +6,12 @@ test('replace an agent basket product and prepare updated links', async ({ page 
   await page.getByRole('radio', { name: /Let the agent/ }).check();
   await page.getByRole('button', { name: 'Find everything for me' }).click();
   await expect(page.getByRole('status')).toHaveText('Done');
+  // Reproduce the locked-choice regression before returning to the final basket.
+  await page.getByRole('button', { name: '+ Add or browse products' }).click();
+  await page.getByRole('button', { name: /Oak work desk · Essential.*Open preview/ }).click();
+  await page.getByRole('button', { name: 'Lock this choice', exact: true }).click();
+  await page.getByRole('button', { name: 'Create basket', exact: true }).click();
+  await expect(page.getByRole('status')).toHaveText('Done');
   const rows = page.locator('.wk-unified__item');
   const original = await rows.locator('h2').allTextContents();
   await rows.first().getByRole('button', { name: /^Replace/ }).click();
@@ -14,6 +20,8 @@ test('replace an agent basket product and prepare updated links', async ({ page 
   await dialog.getByRole('button', { name: 'Cancel' }).click();
   await expect(rows.first().locator('h2')).toHaveText(original[0]);
   await rows.first().getByRole('button', { name: /^Replace/ }).click();
+  await expect(dialog.getByText('Your new choice will stay locked so the agent keeps it.')).toBeVisible();
+  await expect(dialog.getByRole('button', { name: /^Use .* instead/ }).first()).toBeEnabled();
   const replacement = await dialog.locator('h3').first().textContent();
   await dialog.getByRole('button', { name: /^Use .* instead/ }).first().click();
   await expect(dialog).not.toBeVisible();

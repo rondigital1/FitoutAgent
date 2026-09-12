@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { initialState, Requirements, Offer } from '@settlein/shared';
+import { initialState, Requirements, Offer } from '@fitoutagent/shared';
 import { transition } from './workflow';
 import { compare } from './planning';
 
@@ -34,10 +34,9 @@ test('completed basket replacement preserves other choices, clears stale links a
   assert.ok(!s.pending?.lines.some(line => line.id === 'desk'));
 });
 
-test('invalid or locked replacements and pending work leave the approved basket intact', async () => {
-  for (const reason of ['locked', 'unavailable', 'fit', 'category', 'unknown', 'pending', 'paused']) {
+test('invalid replacements and pending work leave the approved basket intact', async () => {
+  for (const reason of ['unavailable', 'fit', 'category', 'unknown', 'pending', 'paused']) {
     const s = setup();
-    if (reason === 'locked') s.locks.push('desk');
     if (reason === 'unavailable') s.offers[2].available = false;
     if (reason === 'fit') s.offers[2].fit = { status: 'rejected', summary: 'Wrong product', checks: [], assessedAt: '2026-09-12T00:00:00Z' };
     if (reason === 'category') s.offers[2].checklistItemId = 'chair';
@@ -103,4 +102,16 @@ test('an empty basket cannot prepare checkout links', async () => {
   for (const productId of ['desk', 'chair']) await transition(s, { type: 'edit-basket-item', productId, quantity: 0 }, emit);
   await assert.rejects(transition(s, { type: 'approve', planId: 'essential' }, emit), /Add an item/);
   assert.equal(s.pending, null);
+});
+
+test('explicit replacement transfers a locked pick and preserves quantity and other locks', async () => {
+  const s = setup();
+  s.locks.push('desk');
+  await transition(s, decision, emit);
+  assert.deepEqual(s.selected, ['alternative', 'chair']);
+  assert.deepEqual(s.locks, ['chair', 'alternative']);
+  assert.equal(s.requirements!.items[0].quantity, 2);
+  assert.deepEqual(s.baskets, []);
+  await transition(s, { type: 'approve', planId: 'essential' }, emit);
+  assert.equal(s.pending?.lines.find(line => line.id === 'alternative')?.quantity, 2);
 });

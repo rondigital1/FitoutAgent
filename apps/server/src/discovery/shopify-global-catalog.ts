@@ -1,5 +1,5 @@
 import { fetchRetailer, searchItems } from './runtime';
-import type { DiscoveryTool, Offer, Requirements } from '@settlein/shared';
+import type { DiscoveryTool, Offer, Requirements } from '@fitoutagent/shared';
 
 /**
  * FACT: Shopify Global Catalog MCP — cross-merchant product search (no store required).

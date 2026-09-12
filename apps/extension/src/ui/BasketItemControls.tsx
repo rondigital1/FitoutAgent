@@ -1,4 +1,4 @@
-import type { Offer, State } from '@settlein/shared';
+import type { Offer, State } from '@fitoutagent/shared';
 
 export function BasketItemControls({ state, offer, disabled, onEdit }: {
   state: State; offer: Offer; disabled: boolean;

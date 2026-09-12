@@ -17,7 +17,7 @@ importers:
       '@ag-ui/client':
         specifier: 0.0.59
         version: 0.0.59
-      '@settlein/shared':
+      '@fitoutagent/shared':
         specifier: workspace:*
         version: link:../../packages/shared
       react:
@@ -63,7 +63,7 @@ importers:
       '@ag-ui/encoder':
         specifier: 0.0.59
         version: 0.0.59
-      '@settlein/shared':
+      '@fitoutagent/shared':
         specifier: workspace:*
         version: link:../../packages/shared
       cors:

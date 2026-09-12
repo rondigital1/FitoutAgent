@@ -1,4 +1,4 @@
-import { money, type Plan } from '@settlein/shared';
+import { money, type Plan } from '@fitoutagent/shared';
 
 export function PlanDock({
   feedback, plans, activeId, approved, blocked, disabled, onActivate, onCreate, onEditChecklist,

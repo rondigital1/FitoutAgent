@@ -1,4 +1,4 @@
-import { evaluate, knownUnitCost, merchantKey, type Offer, type Plan, type Requirements } from '@settlein/shared';
+import { evaluate, knownUnitCost, merchantKey, type Offer, type Plan, type Requirements } from '@fitoutagent/shared';
 
 type Strategy = 'fit' | 'cost' | 'stores';
 type Basket = { offers: Offer[]; cost: number; unknownPrice: number; unknownFit: number; unknownFees: number; stores: Set<string> };

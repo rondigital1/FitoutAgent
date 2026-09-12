@@ -1,4 +1,4 @@
-import type { BrowserCartTool, CartRequest, CartResult } from '@settlein/shared';
+import type { BrowserCartTool, CartRequest, CartResult } from '@fitoutagent/shared';
 import { shopifyEnabled, storefront } from '../discovery/shopify';
 
 /**
@@ -52,7 +52,7 @@ const carts = new Map<string, string>(); // request.id -> cart GID
 function quantitiesByVariant(lines: CartRequest['lines']) {
   const quantities = new Map<string, number>();
   for (const line of lines) {
-    if (line.owner !== 'settlein') continue;
+    if (line.owner !== 'fitoutagent') continue;
     const id = line.id.replace(/^Shopify:/, '');
     quantities.set(id, (quantities.get(id) ?? 0) + line.quantity);
   }
@@ -87,7 +87,7 @@ export const shopifyCart: BrowserCartTool = {
       const lines = (cart.lines?.nodes ?? []).map(n => ({
         id: n.merchandise?.id ? `Shopify:${n.merchandise.id}` : 'unknown',
         quantity: n.quantity,
-        owner: 'settlein' as const,
+        owner: 'fitoutagent' as const,
       }));
       const wanted = quantitiesByVariant(request.lines);
       const actual = quantitiesByVariant(lines);

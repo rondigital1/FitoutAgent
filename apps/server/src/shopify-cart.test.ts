@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, test } from 'node:test';
 import assert from 'node:assert/strict';
-import type { CartRequest, Offer } from '@settlein/shared';
+import type { CartRequest, Offer } from '@fitoutagent/shared';
 import { prepareStorefront } from './cart/storefront-handoff';
 import { shopifyCart } from './cart/shopify-cart';
 
@@ -27,8 +27,8 @@ function request(id: string): CartRequest {
   return {
     id, retailer: 'Shopify', operation: 'prepare-and-verify',
     lines: [
-      { id: 'mugs', quantity: 2, owner: 'settlein' },
-      { id: 'extra-mug', quantity: 1, owner: 'settlein' },
+      { id: 'mugs', quantity: 2, owner: 'fitoutagent' },
+      { id: 'extra-mug', quantity: 1, owner: 'fitoutagent' },
     ],
   };
 }

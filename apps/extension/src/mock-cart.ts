@@ -1,4 +1,4 @@
-import { CartRequest, type CartResult, type BrowserCartTool } from '@settlein/shared';
+import { CartRequest, type CartResult, type BrowserCartTool } from '@fitoutagent/shared';
 type Store = { get(key: string): Promise<unknown>; set(key: string, value: unknown): Promise<void> };
 export function mockCart(store: Store): BrowserCartTool {
   return {

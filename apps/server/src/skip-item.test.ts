@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { initialState, restoreState, Requirements, Offer } from '@settlein/shared';
+import { initialState, restoreState, Requirements, Offer } from '@fitoutagent/shared';
 import { transition } from './workflow';
 import { compare } from './planning';
 
@@ -29,7 +29,7 @@ test('skip persists, undo restores validation, and only found products reach the
   assert.ok(s.plans[0].issues.includes('Missing Chair'));
   await transition(s, { type: 'skip-item', checklistItemId: 'chair' }, emit);
   await transition(s, { type: 'approve', planId: 'essential' }, emit);
-  assert.deepEqual(s.pending?.lines, [{ id: 'Shopify:desk', quantity: 2, owner: 'settlein' }]);
+  assert.deepEqual(s.pending?.lines, [{ id: 'Shopify:desk', quantity: 2, owner: 'fitoutagent' }]);
   await assert.rejects(transition(s, { type: 'restore-item', checklistItemId: 'chair' }, emit), /before preparing/);
 });
 

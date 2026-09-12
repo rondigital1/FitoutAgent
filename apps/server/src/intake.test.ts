@@ -4,7 +4,7 @@ beforeEach(() => { mock.method(smartDecomposer, 'decompose', ruleDecomposer.deco
 afterEach(() => mock.restoreAll());
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { initialState } from '@settlein/shared';
+import { initialState } from '@fitoutagent/shared';
 import { transition } from './workflow';
 import { compositeDiscovery } from './discovery/composite';
 import { mockDiscovery } from './mock-tools';

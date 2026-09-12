@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { initialState, Requirements, Offer } from '@settlein/shared';
+import { initialState, Requirements, Offer } from '@fitoutagent/shared';
 import { transition } from './workflow';
 import { compositeDiscovery } from './discovery/composite';
 import { fitVerifier } from './fit/verify';

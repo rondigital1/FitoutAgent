@@ -28,6 +28,8 @@ export const GoalDraft = z.object({
   /** Omitted in older projects; treated as manual. */
   selectionMode: SelectionMode.optional(),
   goal: z.string().trim().min(1).max(500),
+  /** Raw user text before Handle-it-for-me / start-over rewrite. */
+  originalGoal: z.string().trim().min(1).max(500).optional(),
   budget: z.number().int().positive().max(10000000).nullable().default(null),
   deadline: z.string().date().nullable().default(null),
   zip: z.string().max(16).optional(),
@@ -70,7 +72,7 @@ export type Offer = z.infer<typeof Offer>;
 export const Line = z.object({
   id: z.string(),
   quantity: z.number().int().positive(),
-  owner: z.enum(['existing', 'settlein']),
+  owner: z.enum(['existing', 'fitoutagent']),
 });
 
 export const CartRequest = z.object({

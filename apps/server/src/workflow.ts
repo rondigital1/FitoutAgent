@@ -1,11 +1,12 @@
 import { promptBudget, promptOwned } from './discovery/apartment';
-import { initialState, evaluate, type ChecklistItem, type Decision, type Requirements, type State } from '@settlein/shared';
+import { initialState, evaluate, type ChecklistItem, type Decision, type Requirements, type State } from '@fitoutagent/shared';
 import { activeDiscoverySources } from './discovery/composite';
 import { smartDecomposer } from './discovery/decompose';
 import { editBasketItem } from './edit-basket-item';
 import { replaceBasketProduct } from './replace-basket-product';
 import { promptImprover } from './discovery/improve-prompt';
 import { searchMore } from './search-more';
+import { retryRecovery } from './recovery/retry';
 import { runDiscovery } from './product-discovery';
 import { compare, nextBasket } from './planning';
 import { eligible } from './optimizer';
@@ -23,34 +24,87 @@ export async function transition(s: State, d: Decision, emit: Emit) {
 
   if (d.type === 'start-over') {
     if (!s.draft || s.pending) throw new Error('Wait for the current operation before starting over.');
-    const goal = await promptImprover.improve(s);
-    const draft = { ...s.draft, ...(s.requirements ? { budget: s.requirements.budget, deadline: s.requirements.deadline, owned: s.requirements.owned, zip: s.requirements.zip } : {}), goal };
+    const improved = await promptImprover.improve(s, 'review');
+    const draft = {
+      ...s.draft,
+      ...(s.requirements ? { budget: s.requirements.budget, deadline: s.requirements.deadline, owned: s.requirements.owned, zip: s.requirements.zip } : {}),
+      originalGoal: s.draft.originalGoal ?? s.draft.goal,
+      goal: improved.prompt,
+    };
     const revision = s.revision;
     Object.assign(s, initialState(s.id), { revision, draft, searchingItemId: null, categorySearchHistory: {}, removedBasketProducts: [] });
-    s.log.push('Your improved prompt is ready. Review it, then run your new search.');
+    s.log.push(improved.rationale ? `Improved prompt ready: ${improved.rationale}` : 'Your improved prompt is ready. Review it, then run your new search.');
     return;
   }
 
   if (d.type === 'start' || d.type === 'revise-goal') {
     if (d.type === 'start' && (s.requirements || s.draft)) throw new Error('Use constraint updates for an existing setup.');
     if (s.pending) throw new Error('Wait for the outstanding basket operation.');
-    d.draft = { ...d.draft, budget: d.draft.budget ?? promptBudget(d.draft.goal), owned: [...new Set([...d.draft.owned, ...promptOwned(d.draft.goal)])] };
+    const rawGoal = d.draft.goal;
+    d.draft = {
+      ...d.draft,
+      originalGoal: d.draft.originalGoal ?? rawGoal,
+      budget: d.draft.budget ?? promptBudget(d.draft.goal),
+      owned: [...new Set([...d.draft.owned, ...promptOwned(d.draft.goal)])],
+    };
+
+    // Handle-it-for-me: improve the prompt before checklist + discovery.
+    if (d.draft.selectionMode === 'agent') {
+      s.draft = d.draft;
+      await checkpoint('checklist', 'Improving your prompt for autonomous shopping…');
+      const improved = await promptImprover.improve({ ...s, draft: d.draft }, 'agent');
+      if (improved.prompt && improved.prompt !== d.draft.goal) {
+        d.draft = {
+          ...d.draft,
+          originalGoal: d.draft.originalGoal ?? rawGoal,
+          goal: improved.prompt,
+          budget: d.draft.budget ?? promptBudget(improved.prompt),
+          owned: [...new Set([...d.draft.owned, ...promptOwned(improved.prompt)])],
+        };
+        s.log.push(improved.rationale
+          ? `Prompt improved: ${improved.rationale}`
+          : 'Prompt improved for autonomous shopping.');
+        s.log.push(`Using: ${improved.prompt}`);
+      } else if (improved.rationale) {
+        s.log.push(improved.rationale);
+      }
+    }
+
     const { items, suggestions } = await smartDecomposer.decompose({
       goal: d.draft.goal,
       owned: d.draft.owned,
       budget: d.draft.budget,
       deadline: d.draft.deadline,
     });
+    // Agent mode: fold optional suggestions into the checklist so shopping runs without HITL.
+    const agentItems = d.draft.selectionMode === 'agent' && suggestions.length
+      ? [
+          ...items,
+          ...suggestions
+            .filter(sug => !items.some(i => i.id === sug.id))
+            .slice(0, 3)
+            .map(sug => ({
+              id: sug.id,
+              label: sug.label,
+              query: sug.query,
+              quantity: sug.defaultQty,
+              must: false as const,
+            })),
+        ].slice(0, 12)
+      : items;
     s.offers = []; s.plans = []; s.selected = []; s.skippedItemIds = []; s.removedBasketProducts = []; s.locks = []; s.replacement = null;
     s.draft = d.draft;
-    s.requirements = { ...d.draft, items };
-    s.suggestions = suggestions;
+    s.requirements = { ...d.draft, items: agentItems };
+    s.suggestions = d.draft.selectionMode === 'agent' ? [] : suggestions;
     s.approved = null; s.pending = null; s.baskets = []; s.attempts = {};
     s.discoverySources = activeDiscoverySources();
+    s.searchRecovery = {};
     s.discoveryReports = [];
     await checkpoint(
       'checklist',
-      `Checklist ready (${items.length} items)${suggestions.length ? `, ${suggestions.length} optional add-ons` : ''}.`,
+      d.draft.selectionMode === 'agent'
+        ? `Autonomous checklist ready (${agentItems.length} items). Searching products…`
+        : `Checklist ready (${items.length} items)${suggestions.length ? `, ${suggestions.length} optional add-ons` : ''}.`,
     );
     if (d.draft.selectionMode === 'agent') await runDiscovery(s, s.requirements, emit);
     return;
@@ -70,6 +124,11 @@ export async function transition(s: State, d: Decision, emit: Emit) {
 
   if (d.type === 'replace-basket-product') {
     replaceBasketProduct(s, d.productId, d.replacementId);
+    return;
+  }
+
+  if (d.type === 'retry-recovery') {
+    await retryRecovery(s, d.checklistItemId, emit);
     return;
   }
 
@@ -229,7 +288,7 @@ export async function transition(s: State, d: Decision, emit: Emit) {
     if (!request || request.id !== d.result.id || request.retailer !== d.result.retailer) throw new Error('Stale or mismatched browser result.');
     const verified = d.result.verified && request.lines.every(wanted => d.result.lines.some(actual =>
       (actual.id === wanted.id || actual.id.replace(/^Shopify:/, '') === wanted.id.replace(/^Shopify:/, ''))
-      && actual.owner === 'settlein' && actual.quantity === wanted.quantity));
+      && actual.owner === 'fitoutagent' && actual.quantity === wanted.quantity));
     const result = { ...d.result, verified };
     s.baskets = [...s.baskets.filter(b => b.retailer !== result.retailer), result];
     s.pending = null;

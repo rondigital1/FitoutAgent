@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { generateKeyPairSync } from 'node:crypto';
-import { initialState, type Requirements, type Offer, type CartRequest } from '@settlein/shared';
+import { initialState, type Requirements, type Offer, type CartRequest } from '@fitoutagent/shared';
 import { activeDiscoverySources, discoverProducts } from './discovery/composite';
 import { fetchRetailer, searchItems } from './discovery/runtime';
 import { transition } from './workflow';
@@ -126,7 +126,7 @@ test('concurrency is bounded to four searches per retailer', async () => {
 
 test('Storefront readback preserves scoped offer IDs and aggregates identical variants', async t => {
   const offers: Offer[] = r.items.map(item => ({ id: `store:${item.id}`, checklistItemId: item.id, name: 'Desk', retailer: 'Shopify', nativeId: 'gid://shopify/ProductVariant/42', source: 'ShopifyStorefront', url: null, image: null, brand: null, price: 10000, shipping: null, tax: null, arrival: null, available: true, match: 'alternative' }));
-  const request = { id: 'cart', retailer: 'Shopify' as const, operation: 'prepare-and-verify' as const, lines: offers.map(o => ({ id: o.id, quantity: 1, owner: 'settlein' as const })) };
+  const request = { id: 'cart', retailer: 'Shopify' as const, operation: 'prepare-and-verify' as const, lines: offers.map(o => ({ id: o.id, quantity: 1, owner: 'fitoutagent' as const })) };
   assert.ok(isStorefrontRequest(request, offers));
   assert.equal(isStorefrontRequest(request, offers.map(o => ({ ...o, source: 'ShopifyGlobalCatalog' }))), false);
   t.mock.method(shopifyCart, 'prepare', async (actual: CartRequest) => { assert.equal(actual.lines.length, 1); assert.equal(actual.lines[0].quantity, 2); });

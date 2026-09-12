@@ -1,4 +1,4 @@
-import type { DiscoveryReport, State, SearchRecovery } from '@settlein/shared';
+import type { DiscoveryReport, State, SearchRecovery } from '@fitoutagent/shared';
 import { activeDiscoverySources, compositeDiscovery } from '../discovery/composite';
 import { fitVerifier } from '../fit/verify';
 import { recoveryStrategy, signature } from './strategy';
@@ -10,6 +10,10 @@ import { finishRecovery, suitable, unresolved } from './status';
 export async function recoverSearch(s: State, emit: (s: State) => Promise<void>, itemIds?: string[]) {
   if (!s.requirements) return;
   const r = s.requirements;
+  for (const [id, record] of Object.entries(s.searchRecovery ?? {})) {
+    const item = r.items.find(item => item.id === id);
+    if (item && (!itemIds || itemIds.includes(id)) && !unresolved(s, item)) finishRecovery(s, item, record);
+  }
   const items = r.items.filter(item => !s.skippedItemIds.includes(item.id) && (!itemIds || itemIds.includes(item.id)) && unresolved(s, item));
   const sources = activeDiscoverySources().filter(source => source !== 'Mock');
   s.searchRecovery ??= {};
@@ -56,11 +60,11 @@ export async function recoverSearch(s: State, emit: (s: State) => Promise<void>,
             const previous = merged.get(offer.id);
             // A failed reassessment cannot erase previously obtained evidence for identical data.
             const same = previous && previous.name === offer.name && previous.description === offer.description && previous.variant === offer.variant && previous.brand === offer.brand;
-            merged.set(offer.id, same && offer.fit?.summary.includes('assessment failed') ? { ...offer, fit: previous.fit, match: previous.match } : offer);
+            merged.set(offer.id, same && offer.fit?.failure ? { ...offer, fit: previous.fit, match: previous.match } : offer);
           }
           s.offers = [...merged.values()];
           attempt.found = checked.length;
-          const serviceError = reports.some(report => report.issues.length) || checked.some(o => o.fit?.summary.includes('assessment failed') || !o.fit);
+          const serviceError = reports.some(report => report.issues.length) || checked.some(o => o.fit?.failure || !o.fit);
           attempt.outcome = !unresolved(s, item) ? 'matched' : serviceError ? 'source-error' : checked.some(o => o.fit?.status === 'unknown') ? 'unverified' : 'no-match';
         } catch { attempt.outcome = 'source-error'; }
         for (const report of reports) {

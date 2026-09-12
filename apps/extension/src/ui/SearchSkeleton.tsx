@@ -1,4 +1,4 @@
-import type { ChecklistItem } from '@settlein/shared';
+import type { ChecklistItem } from '@fitoutagent/shared';
 
 /** Placeholder shelves while discovery runs, so the stage keeps its shape and the
  * user can see which categories are still being searched. */

@@ -33,7 +33,7 @@ test('older item-only drafts use server budget defaults', async ({ page }) => {
   await page.getByRole('button', { name: 'Make my list' }).click();
   await expect(page.getByRole('spinbutton', { name: 'Total budget' })).toHaveValue('1500');
   await page.evaluate(() => {
-    const key = `settlein-review-${localStorage.getItem('settlein-thread')}`;
+    const key = `fitoutagent-review-${localStorage.getItem('fitoutagent-thread')}`;
     const saved = JSON.parse(localStorage.getItem(key)!);
     delete saved.budget; delete saved.deadline;
     saved.items[0].quantity = 3;

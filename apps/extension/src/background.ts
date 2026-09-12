@@ -1,4 +1,4 @@
-import { CartRequest } from '@settlein/shared';
+import { CartRequest } from '@fitoutagent/shared';
 import { mockCart } from './mock-cart';
 chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(console.error);
 const cart = mockCart({
@@ -7,7 +7,7 @@ const cart = mockCart({
 });
 let queue = Promise.resolve();
 chrome.runtime.onMessage.addListener((message, sender, respond) => {
-  if (sender.id !== chrome.runtime.id || message.type !== 'SETTLEIN_MOCK_CART') return false;
+  if (sender.id !== chrome.runtime.id || message.type !== 'FITOUTAGENT_MOCK_CART') return false;
   const parsed = CartRequest.safeParse(message.request);
   if (!parsed.success) { respond({ error: 'Invalid cart request' }); return false; }
   queue = queue.then(async () => {

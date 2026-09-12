@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { money, type Offer, type State } from '@settlein/shared';
+import { money, type Offer, type State } from '@fitoutagent/shared';
 import { ProductSheet } from './ProductSheet';
 import { SearchSkeleton } from './SearchSkeleton';
 import { Shelf } from './Shelf';
+import { SearchRecoveryPanel } from './SearchRecoveryPanel';
 
 const sourceNames: Record<string, string> = { ShopifyGlobalCatalog: 'Shopify marketplace', ShopifyStorefront: 'Shopify store', WalmartAffiliate: 'Walmart', BestBuy: 'Best Buy', Mock: 'Demo products' };
 
@@ -18,7 +19,7 @@ function railOrder(offers: Offer[]) {
 }
 
 export function ShopStage({
-  state, disabled, onLock, onReplace, onSelect, onEditChecklist, onSkip, onRestore, onSearchMore,
+  state, disabled, onLock, onReplace, onSelect, onEditChecklist, onSkip, onRestore, onSearchMore, onRetryRecovery, onReviewRequirements,
 }: {
   state: State;
   disabled: boolean;
@@ -27,6 +28,8 @@ export function ShopStage({
   onSelect(productId: string): void;
   onEditChecklist(): void;
   onSearchMore(checklistItemId: string): void;
+  onRetryRecovery(checklistItemId: string): void;
+  onReviewRequirements(): void;
   onSkip(checklistItemId: string): void;
   onRestore(checklistItemId: string): void;
 }) {
@@ -50,6 +53,7 @@ export function ShopStage({
       {state.draft?.selectionMode === 'agent' && state.phase === 'compare' && (
         <p className="wk-notice">The agent compared complete baskets using product fit, quantities and known costs. Review unconfirmed details, or apply a different basket below. Locked products stay in every recommendation.</p>
       )}
+      <SearchRecoveryPanel state={state} disabled={disabled || state.phase !== 'compare' || !!state.approved} onRetry={onRetryRecovery} onReview={onReviewRequirements} />
       {unavailable && (
         <div className="wk-replace">
           <p className="wk-label">Your decision</p>

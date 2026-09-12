@@ -1,4 +1,4 @@
-import type { Offer } from '@settlein/shared';
+import type { Offer } from '@fitoutagent/shared';
 import type { TileEmphasis } from './ProductTile';
 
 export type ShelfFacts = {

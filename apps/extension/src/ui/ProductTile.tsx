@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { money, proxiedImage, type Offer } from '@settlein/shared';
+import { money, proxiedImage, type Offer } from '@fitoutagent/shared';
 import { agentBase } from '../agent-base';
 import { ProductArt } from './ProductArt';
 import { RetailerMark } from './RetailerMark';

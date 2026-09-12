@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { money, type State } from '@settlein/shared';
+import { money, type State } from '@fitoutagent/shared';
 import { useSetup } from './use-setup';
 import { SetupForm } from './SetupForm';
 import { ChecklistReview } from './ChecklistReview';
@@ -24,10 +24,10 @@ function reachedStages(s: State): StageId[] {
 }
 
 const STAGE_TITLES: Record<StageId, { eyebrow: string; title: string }> = {
-  setup: { eyebrow: '01 · Project', title: 'What do you want to furnish or buy?' },
-  checklist: { eyebrow: '02 · Checklist', title: 'Make the list yours' },
-  shop: { eyebrow: '03 · Shop', title: 'Offers by category' },
-  baskets: { eyebrow: '04 · Basket', title: 'Your basket' },
+  setup: { eyebrow: 'Project', title: 'What are you shopping for?' },
+  checklist: { eyebrow: 'Shopping list', title: 'Review your list' },
+  shop: { eyebrow: 'Products', title: 'Browse products' },
+  baskets: { eyebrow: 'Cart', title: 'Your cart' },
 };
 
 export function App() {
@@ -64,7 +64,7 @@ export function App() {
       <main className="wk-stage">
         <div className="wk-stage__head">
           <span className="wk-label">{STAGE_TITLES[stage].eyebrow}</span>
-          <h1>{stage === 'shop' && s.draft?.selectionMode === 'agent' ? 'Your agent’s product picks' : STAGE_TITLES[stage].title}</h1>
+          <h1>{stage === 'shop' && s.draft?.selectionMode === 'agent' ? 'Recommended products' : STAGE_TITLES[stage].title}</h1>
           {s.requirements && (stage === 'shop' || stage === 'baskets') && (
             <p className="muted">
               {s.requirements.budget === null ? 'No spending limit set' : `${money(s.requirements.budget)} budget`}
@@ -75,12 +75,12 @@ export function App() {
 
         <div className="wk-toolbar">
           {connecting && <span className="muted">Connecting to local runtime…</span>}
-          <button type="button" className="btn-quiet" disabled={busy || !!s.pending} onClick={() => reset()}>New project</button>
+          <button type="button" className="btn-quiet" disabled={busy || !!s.pending} onClick={() => reset()}>New order</button>
           {s.draft && <button type="button" disabled={disabled || !!s.pending} onClick={() => {
             void send({ type: 'start-over' }).then(ok => { if (ok) { lastAuto.current = 'setup'; setOverride('setup'); setPlanId(null); window.scrollTo(0, 0); } });
           }}>Start over</button>}
-          {s.requirements && stage !== 'setup' && <button type="button" className="btn-quiet" onClick={() => setOverride('setup')}>Edit prompt</button>}
-          {s.requirements && s.phase !== 'checklist' && <button type="button" disabled={disabled || !!s.pending} onClick={() => void send({ type: 'edit-checklist' })}>Edit list and budget</button>}
+          {s.requirements && stage !== 'setup' && <button type="button" className="btn-quiet" onClick={() => setOverride('setup')}>Edit project</button>}
+          {s.requirements && s.phase !== 'checklist' && <button type="button" disabled={disabled || !!s.pending} onClick={() => void send({ type: 'edit-checklist' })}>Edit list</button>}
         </div>
 
         {error && (
@@ -135,6 +135,8 @@ export function App() {
             disabled={disabled}
             onLock={productId => void send({ type: 'lock', productId })}
             onSearchMore={checklistItemId => void send({ type: 'search-more', checklistItemId })}
+            onRetryRecovery={checklistItemId => void send({ type: 'retry-recovery', checklistItemId })}
+            onReviewRequirements={() => setOverride('setup')}
             onSkip={checklistItemId => void send({ type: 'skip-item', checklistItemId })}
             onRestore={checklistItemId => void send({ type: 'restore-item', checklistItemId })}
             onSelect={productId => void send({ type: 'select', productId })}
@@ -183,7 +185,7 @@ export function App() {
         />
       ) : (
         <footer className="wk-foot">
-          <span>SettleIn · multi-item agent</span>
+          <span>FitoutAgent</span>
           <span>US · USD</span>
         </footer>
       )}

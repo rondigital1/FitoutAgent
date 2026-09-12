@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { restoreState, initialState, type Requirements } from '@settlein/shared';
+import { restoreState, initialState, type Requirements } from '@fitoutagent/shared';
 import { transition } from './workflow';
 import { smartDecomposer, ruleDecomposer } from './discovery/decompose';
 import { compositeDiscovery } from './discovery/composite';
@@ -33,7 +33,7 @@ test('edit prompt, edit list, select products, prepare all links, then edit agai
   while (s.pending) {
     const result = verifyLinkHandoff(s.pending, s.offers);
     assert.ok(result.verified);
-    assert.ok(result.lines.every(l => l.owner === 'settlein'));
+    assert.ok(result.lines.every(l => l.owner === 'fitoutagent'));
     assert.equal(result.checkoutUrl, undefined);
     await transition(s, { type: 'cart-result', result }, emit);
   }

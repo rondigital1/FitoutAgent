@@ -1,4 +1,4 @@
-import { merchantKey, type Offer, type State } from '@settlein/shared';
+import { merchantKey, type Offer, type State } from '@fitoutagent/shared';
 
 export type BasketItem = { offer: Offer; quantity: number; categories: string[] };
 

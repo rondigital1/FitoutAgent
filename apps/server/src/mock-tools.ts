@@ -1,4 +1,4 @@
-import type { DiscoveryTool, Offer, RefreshTool, Requirements } from '@settlein/shared';
+import type { DiscoveryTool, Offer, RefreshTool, Requirements } from '@fitoutagent/shared';
 
 const OFFICE_PRICES: Record<string, number> = {
   desk: 18000,

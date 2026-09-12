@@ -7,7 +7,7 @@ import {
   type ChecklistItem,
   type DecomposeTool,
   type Suggestion,
-} from '@settlein/shared';
+} from '@fitoutagent/shared';
 import { llmDecomposer } from './llm-decompose';
 
 function isTemplateGoal(goal: string): 'office' | 'camping' | null {

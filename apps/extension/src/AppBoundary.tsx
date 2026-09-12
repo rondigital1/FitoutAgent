@@ -14,7 +14,7 @@ export class AppBoundary extends Component<{ children: ReactNode }, { failed: bo
         <p role="alert">This view could not load. Your saved project is still on this device.</p>
         <div className="wk-panel__actions">
           <button className="primary" onClick={() => window.location.reload()}>Reload project</button>
-          <button onClick={() => { localStorage.removeItem('settlein-thread'); window.location.reload(); }}>Start a new project</button>
+          <button onClick={() => { localStorage.removeItem('fitoutagent-thread'); window.location.reload(); }}>Start a new project</button>
         </div>
       </div>
     </main>;

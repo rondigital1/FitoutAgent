@@ -1,4 +1,4 @@
-import type { CartRequest, CartResult, Offer } from '@settlein/shared';
+import type { CartRequest, CartResult, Offer } from '@fitoutagent/shared';
 import { shopifyCart } from './shopify-cart';
 
 export function isStorefrontRequest(request: CartRequest, offers: Offer[]) {
@@ -19,7 +19,7 @@ export async function prepareStorefront(request: CartRequest, offers: Offer[]): 
   }
   const remapped: CartRequest = {
     ...request,
-    lines: [...quantities].map(([id, quantity]) => ({ id, quantity, owner: 'settlein' })),
+    lines: [...quantities].map(([id, quantity]) => ({ id, quantity, owner: 'fitoutagent' })),
   };
   await shopifyCart.prepare(remapped);
   const result = await shopifyCart.verify(remapped);

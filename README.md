@@ -1,10 +1,10 @@
-# SettleIn
+# FitoutAgent
 
-SettleIn helps you buy a lot of things at once.
+FitoutAgent helps you buy a lot of things at once.
 
 You describe a project in one sentence — *"Furnish an 800 sq ft two-bedroom apartment for two people under $5,000, we already have a sofa"* — and it turns that into a shopping list, searches real retailers for each item, picks a basket that fits your budget, and hands you the links to buy.
 
-It does not take your money. SettleIn prepares the basket; you check out on the retailers' own websites.
+It does not take your money. FitoutAgent prepares the basket; you check out on the retailers' own websites.
 
 ## What it actually does
 

@@ -33,4 +33,5 @@ compositeDiscovery.discover = async (requirements, _onIssue, onReport, options) 
   return offers;
 };
 await import('./fit-fixture.mts');
+await import('./search-recovery-fixture.mts');
 await import('../apps/server/src/index');

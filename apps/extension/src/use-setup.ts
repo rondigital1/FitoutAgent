@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { setupAgent as agent } from './agent';
-import { CartResult, restoreState, type Decision, type State } from '@settlein/shared';
+import { CartResult, restoreState, type Decision, type State } from '@fitoutagent/shared';
 
 import { agentBase } from './agent-base';
 
@@ -17,10 +17,10 @@ async function runServerCart(request: NonNullable<State['pending']>, state: Stat
 }
 
 export function resetSetup() {
-  localStorage.removeItem('settlein-thread');
+  localStorage.removeItem('fitoutagent-thread');
   // Clear checklist draft caches for old threads
   for (const key of Object.keys(localStorage)) {
-    if (key.startsWith('settlein-review-') || key.startsWith('settlein-prompt-')) localStorage.removeItem(key);
+    if (key.startsWith('fitoutagent-review-') || key.startsWith('fitoutagent-prompt-')) localStorage.removeItem(key);
   }
   window.location.reload();
 }

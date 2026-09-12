@@ -5,7 +5,7 @@ import express from 'express';
 import cors from 'cors';
 import { RunAgentInputSchema, EventType } from '@ag-ui/core';
 import { EventEncoder } from '@ag-ui/encoder';
-import { CartRequest, Decision, Offer, initialState, type State } from '@settlein/shared';
+import { CartRequest, Decision, Offer, initialState, type State } from '@fitoutagent/shared';
 import { z } from 'zod';
 import { LocalAmbiguousAdapter } from './ambiguous';
 import { verifyLinkHandoff } from './cart/link-handoff';
@@ -106,4 +106,4 @@ app.post('/agent', async (req, res) => {
 });
 
 app.listen(Number(process.env.PORT ?? 4100), '127.0.0.1', () =>
-  console.log(`SettleIn runtime: http://127.0.0.1:4100 sources=${activeDiscoverySources().join(',')}`));
+  console.log(`FitoutAgent runtime: http://127.0.0.1:4100 sources=${activeDiscoverySources().join(',')}`));

@@ -1,4 +1,4 @@
-import type { ChecklistItem, State } from '@settlein/shared';
+import type { ChecklistItem, State } from '@fitoutagent/shared';
 import { categorySearchPlanner } from '../discovery/category-search-plan';
 
 export const signature = (query: string, source: string) => `${query.toLowerCase().replace(/\s+/g, ' ').trim()}|${source}`;
