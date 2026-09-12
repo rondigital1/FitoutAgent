@@ -15,8 +15,28 @@ import { imageProxy } from './images';
 import { shopifyEnabled } from './discovery/shopify';
 import { transition } from './workflow';
 
+const PANEL_ORIGIN = process.env.PANEL_ORIGIN ?? 'http://127.0.0.1:5173';
+
+/** Local prototype: allow the configured panel origin, its localhost/127.0.0.1 twin, and the Chrome extension. */
+function allowOrigin(origin: string | undefined): boolean {
+  if (!origin) return true;
+  if (/^chrome-extension:\/\/[a-p]{32}$/.test(origin)) return true;
+  if (origin === PANEL_ORIGIN) return true;
+  try {
+    const expected = new URL(PANEL_ORIGIN);
+    const actual = new URL(origin);
+    const loopback = (host: string) => host === '127.0.0.1' || host === 'localhost';
+    return actual.protocol === expected.protocol
+      && actual.port === expected.port
+      && loopback(actual.hostname)
+      && loopback(expected.hostname);
+  } catch {
+    return false;
+  }
+}
+
 const app = express();
-app.use(cors({ origin: (origin, done) => done(null, !origin || /^chrome-extension:\/\/[a-p]{32}$/.test(origin) || origin === (process.env.PANEL_ORIGIN ?? 'http://127.0.0.1:5173')) }));
+app.use(cors({ origin: (origin, done) => done(null, allowOrigin(origin)) }));
 app.use(express.json({ limit: '512kb' }));
 app.use(imageProxy);
 const storage = new LocalAmbiguousAdapter();

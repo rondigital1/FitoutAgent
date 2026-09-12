@@ -1,5 +1,8 @@
 import { promptImprover } from '../apps/server/src/discovery/improve-prompt';
-promptImprover.improve = async state => `Find suitable products for ${state.draft!.goal}. Compare product fit, prices and available sellers.`;
+promptImprover.improve = async state => ({
+  prompt: `Find suitable products for ${state.draft!.goal}. Compare product fit, prices and available sellers.`,
+  rationale: 'Clarified your goal for shopping.',
+});
 import { categorySearchPlanner } from '../apps/server/src/discovery/category-search-plan';
 categorySearchPlanner.plan = async (_state, item) => {
   await new Promise(resolve => setTimeout(resolve, 300));

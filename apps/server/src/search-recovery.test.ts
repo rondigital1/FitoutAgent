@@ -1,6 +1,6 @@
 import { test, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
-import { initialState, Requirements, Offer, restoreState, type State } from '@fitoutagent/shared';
+import { initialState, Requirements, Offer, restoreState, type State, type DiscoveryReport, type ChecklistItem } from '@fitoutagent/shared';
 import { compositeDiscovery } from './discovery/composite';
 import { categorySearchPlanner } from './discovery/category-search-plan';
 import { fitVerifier } from './fit/verify';
@@ -31,7 +31,7 @@ test('recovery changes source, preserves requirements, rejects unsuitable hits a
   const s = setup(), original = structuredClone(s.requirements), chair = s.offers[0];
   t.mock.method(categorySearchPlanner, 'plan', async () => ({ query: 'platform bed', sources: ['BestBuy'], reason: 'Try a different phrase' }));
   let requests = 0;
-  t.mock.method(compositeDiscovery, 'discover', async (r, _issue, _report, options) => {
+  t.mock.method(compositeDiscovery, 'discover', async (r: Requirements, _issue: unknown, _report: unknown, options?: { sources?: string[] }) => {
     requests++;
     assert.equal(r.items.length, 1);
     assert.ok(r.items[0].query.includes(original!.items[0].query));
@@ -39,7 +39,7 @@ test('recovery changes source, preserves requirements, rejects unsuitable hits a
     assert.deepEqual(options?.sources, [requests === 1 ? 'BestBuy' : 'ShopifyGlobalCatalog']);
     return [product(requests === 1 ? 'cover' : 'frame', requests === 1 ? 'rejected' : 'verified')];
   });
-  t.mock.method(fitVerifier, 'verify', async (r, offers) => { assert.deepEqual(r.items, [original!.items[0]]); return offers; });
+  t.mock.method(fitVerifier, 'verify', async (r: Requirements, offers: Offer[]) => { assert.deepEqual(r.items, [original!.items[0]]); return offers; });
   await recoverSearch(s, emit);
   assert.equal(requests, 2);
   assert.equal(s.searchRecovery?.bed.status, 'resolved');
@@ -65,11 +65,11 @@ test('same query/source is never repeated and exhaustion asks only for an explic
 test('source outages and fit-service failures preserve successes and do not ask to change requirements', async t => {
   const s = setup();
   t.mock.method(categorySearchPlanner, 'plan', async () => ({ query: 'platform bed', sources: ['BestBuy'], reason: 'alternate' }));
-  t.mock.method(compositeDiscovery, 'discover', async (_r, _issue, report) => {
+  t.mock.method(compositeDiscovery, 'discover', async (_r: Requirements, _issue: unknown, report?: (r: DiscoveryReport) => void) => {
     report?.({ source: 'BestBuy', offerCount: 0, issues: [{ checklistItemId: 'bed', message: 'Retailer returned HTTP 429' }] });
     return [product('candidate', 'unknown')];
   });
-  t.mock.method(fitVerifier, 'verify', async (_r, offers) => offers.map(o => ({ ...o, fit: { ...o.fit!, failure: 'provider' as const } })));
+  t.mock.method(fitVerifier, 'verify', async (_r: Requirements, offers: Offer[]) => offers.map((o: Offer) => ({ ...o, fit: { ...o.fit!, failure: 'provider' as const } })));
   await recoverSearch(s, emit);
   assert.equal(s.searchRecovery?.bed.status, 'source-error');
   assert.doesNotMatch(s.searchRecovery!.bed.message, /willing to change/);
@@ -81,7 +81,7 @@ test('unverified live products trigger recovery and cannot finish agent mode aut
   const s = setup(); s.locks = []; s.requirements!.selectionMode = 'agent';
   t.mock.method(categorySearchPlanner, 'plan', async () => ({ query: 'platform bed', sources: ['BestBuy'], reason: 'alternate' }));
   const search = t.mock.method(compositeDiscovery, 'discover', async () => [product('candidate', 'unknown'), product('chair')]);
-  t.mock.method(fitVerifier, 'verify', async (_r, offers) => offers);
+  t.mock.method(fitVerifier, 'verify', async (_r: Requirements, offers: Offer[]) => offers);
   await runDiscovery(s, s.requirements!, emit);
   assert.equal(search.mock.callCount(), 3);
   assert.equal(s.phase, 'compare'); assert.equal(s.approved, null); assert.equal(s.pending, null);
@@ -91,12 +91,12 @@ test('unverified live products trigger recovery and cannot finish agent mode aut
 test('unknown planner sources fall back to configured sources without broadening requirements', async t => {
   const s = setup();
   t.mock.method(categorySearchPlanner, 'plan', async () => ({ query: 'ignore original constraints', sources: ['ImaginaryStore'], reason: 'bad output' }));
-  t.mock.method(compositeDiscovery, 'discover', async (r, _issue, _report, options) => {
+  t.mock.method(compositeDiscovery, 'discover', async (r: Requirements, _issue: unknown, _report: unknown, options?: { sources?: string[] }) => {
     assert.ok(!options?.sources?.includes('ImaginaryStore'));
     assert.ok(r.items[0].query.includes(s.requirements!.items[0].query));
     return [product()];
   });
-  t.mock.method(fitVerifier, 'verify', async (_r, offers) => offers);
+  t.mock.method(fitVerifier, 'verify', async (_r: Requirements, offers: Offer[]) => offers);
   await recoverSearch(s, emit);
   assert.equal(s.searchRecovery?.bed.status, 'resolved');
 });
@@ -112,7 +112,7 @@ test('locks prevent recovery from replacing an unsuitable choice', async t => {
 test('recovery enforces a run-wide limit and serializes concurrent persistence writes', async t => {
   const s = setup(); s.offers = []; s.locks = [];
   s.requirements!.items = Array.from({ length: 10 }, (_, i) => ({ ...s.requirements!.items[0], id: `item-${i}` }));
-  t.mock.method(categorySearchPlanner, 'plan', async (_s, item) => ({ query: item.query, sources: ['BestBuy'], reason: 'alternate' }));
+  t.mock.method(categorySearchPlanner, 'plan', async (_s: State, item: ChecklistItem) => ({ query: item.query, sources: ['BestBuy'], reason: 'alternate' }));
   const search = t.mock.method(compositeDiscovery, 'discover', async () => []);
   let writing = false;
   await recoverSearch(s, async () => {
@@ -127,7 +127,7 @@ test('explicit retry fills only the requested gap and preserves unrelated choice
   const s = setup();
   t.mock.method(categorySearchPlanner, 'plan', async () => ({ query: 'platform frame', sources: ['BestBuy'], reason: 'alternate' }));
   t.mock.method(compositeDiscovery, 'discover', async () => [product()]);
-  t.mock.method(fitVerifier, 'verify', async (_r, offers) => offers);
+  t.mock.method(fitVerifier, 'verify', async (_r: Requirements, offers: Offer[]) => offers);
   await transition(s, { type: 'retry-recovery', checklistItemId: 'bed' }, emit);
   assert.deepEqual(new Set(s.selected), new Set(['chair', 'bed']));
   assert.deepEqual(s.locks, ['chair']); assert.equal(s.phase, 'compare');
