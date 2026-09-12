@@ -4,8 +4,8 @@ test('fit evidence and one-click basket creation work in the responsive side pan
   const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
   await page.goto('/');
   await page.getByRole('textbox').fill('fit scenario under $1000');
-  await page.getByRole('button', { name: 'Make my list' }).click();
-  await page.getByRole('button', { name: 'Find products for this list' }).click();
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByRole('button', { name: 'Find products' }).click();
   await expect(page.getByRole('button', { name: /Oak desk A.*in your plan/ })).toBeVisible();
   await page.getByRole('button', { name: /Desk cover.*Open preview/ }).click();
   await expect(page.getByRole('region', { name: 'Product fit assessment' })).toContainText('A cover is an accessory');
@@ -23,7 +23,7 @@ test('fit evidence and one-click basket creation work in the responsive side pan
   expect(panel!.height).toBeLessThan(400);
   await page.screenshot({ path: testInfo.outputPath('basket-controls-desktop.png') });
   await page.getByRole('button', { name: 'Create basket' }).click();
-  await expect(page.getByRole('heading', { name: 'Your basket', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Your cart', exact: true })).toBeVisible();
   await expect(page.getByRole('status')).toHaveText('Done');
   await expect(page.locator('.wk-basket__links')).toContainText('Oak desk B');
   await page.reload();

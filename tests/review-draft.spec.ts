@@ -2,8 +2,8 @@ import { test, expect, type Locator } from '@playwright/test';
 
 test('review budget and date survive reload, clearing, and confirmation', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('textbox', { name: 'What do you need?' }).fill('office under $1500');
-  await page.getByRole('button', { name: 'Make my list' }).click();
+  await page.getByRole('textbox', { name: 'Describe your project' }).fill('office under $1500');
+  await page.getByRole('button', { name: 'Continue' }).click();
   await page.getByRole('spinbutton', { name: 'Total budget' }).fill('2300.25');
   await page.getByText('Delivery date · optional', { exact: true }).click();
   await page.getByLabel('Needed by').fill('2027-06-15');
@@ -22,15 +22,15 @@ test('review budget and date survive reload, clearing, and confirmation', async 
   await page.reload();
   await expect(page.getByRole('spinbutton', { name: 'Total budget' })).toHaveValue('2300.25');
   const submitted = page.waitForRequest(r => r.url().endsWith('/agent') && r.postDataJSON()?.forwardedProps?.decision?.type === 'confirm-checklist');
-  await page.getByRole('button', { name: 'Find products for this list' }).click();
+  await page.getByRole('button', { name: 'Find products' }).click();
   expect((await submitted).postDataJSON().forwardedProps.decision).toMatchObject({ budget: 230025, deadline: '2027-06-15' });
-  await expect(page.getByRole('heading', { name: 'Offers by category' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Browse products' })).toBeVisible();
 });
 
 test('older item-only drafts use server budget defaults', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('textbox', { name: 'What do you need?' }).fill('office under $1500');
-  await page.getByRole('button', { name: 'Make my list' }).click();
+  await page.getByRole('textbox', { name: 'Describe your project' }).fill('office under $1500');
+  await page.getByRole('button', { name: 'Continue' }).click();
   await expect(page.getByRole('spinbutton', { name: 'Total budget' })).toHaveValue('1500');
   await page.evaluate(() => {
     const key = `fitoutagent-review-${localStorage.getItem('fitoutagent-thread')}`;
@@ -47,8 +47,8 @@ test('older item-only drafts use server budget defaults', async ({ page }) => {
 for (const goal of ['office', 'office under $1500']) {
   test(`budget presets can be toggled and skipped for ${goal}`, async ({ page }) => {
     await page.goto('/');
-    await page.getByRole('textbox', { name: 'What do you need?' }).fill(goal);
-    await page.getByRole('button', { name: 'Make my list' }).click();
+    await page.getByRole('textbox', { name: 'Describe your project' }).fill(goal);
+    await page.getByRole('button', { name: 'Continue' }).click();
     const input = page.getByRole('spinbutton', { name: 'Total budget' });
     const tiers = page.locator('.wk-budget__tier');
     await expect(tiers).toHaveCount(4);
@@ -72,17 +72,17 @@ for (const goal of ['office', 'office under $1500']) {
     await page.reload();
     await expect(page.locator('.wk-budget__tier[aria-pressed="true"]')).toHaveCount(0);
     const submitted = page.waitForRequest(r => r.url().endsWith('/agent') && r.postDataJSON()?.forwardedProps?.decision?.type === 'confirm-checklist');
-    await page.getByRole('button', { name: 'Find products for this list' }).click();
+    await page.getByRole('button', { name: 'Find products' }).click();
     expect((await submitted).postDataJSON().forwardedProps.decision.budget).toBeNull();
-    await expect(page.getByRole('heading', { name: 'Offers by category' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Browse products' })).toBeVisible();
     await expect(page.getByText('No spending limit set', { exact: true })).toBeVisible();
   });
 }
 
 test('budget buttons fit narrow panels and wide screens', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('textbox', { name: 'What do you need?' }).fill('office');
-  await page.getByRole('button', { name: 'Make my list' }).click();
+  await page.getByRole('textbox', { name: 'Describe your project' }).fill('office');
+  await page.getByRole('button', { name: 'Continue' }).click();
   const tiers = page.locator('.wk-budget__tier');
   await expect(tiers).toHaveCount(4);
   for (const width of [280, 390, 1000]) {
