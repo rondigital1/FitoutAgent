@@ -14,7 +14,7 @@ It does not take your money. FitoutAgent prepares the basket; you check out on t
 4. **Builds a basket.** It balances fit, quantities, known costs and how many separate stores you'd order from. You can sort for *Recommended*, *Lowest known cost*, or *Fewer stores*.
 5. **Prepares the links.** All selected products appear together with quantities and sellers. You open them and pay at each merchant.
 
-You can run it two ways: **Let the agent find everything** (it does all five steps unattended) or **Choose item by item** (you review and edit the list before any searching happens).
+You can run it two ways: **Handle it for me** (the agent does all five steps unattended) or step by step (you review and edit the list before any searching happens).
 
 Nothing is hidden from you along the way. Items that no store could match stay visible instead of being quietly dropped, and budget problems block approval rather than being rounded away.
 
